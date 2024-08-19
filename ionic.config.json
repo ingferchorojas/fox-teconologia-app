@@ -1,0 +1,7 @@
+{
+  "name": "Fox Tecnología",
+  "type": "angular",
+  "integrations": {
+    "capacitor": {}
+  }
+}

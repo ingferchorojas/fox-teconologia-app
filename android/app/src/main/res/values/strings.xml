@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Fox Tecnología</string>
+    <string name="title_activity_main">Fox Tecnología</string>
+    <string name="package_name">fox.tecnologia.app</string>
+    <string name="custom_url_scheme">fox.tecnologia.app</string>
+</resources>
