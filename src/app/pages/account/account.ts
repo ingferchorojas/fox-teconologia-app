@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 
 import { UserData } from '../../providers/user-data';
-
+import { App } from '@capacitor/app';
 
 @Component({
   selector: 'page-account',
@@ -18,7 +18,15 @@ export class AccountPage implements AfterViewInit {
     public alertCtrl: AlertController,
     public router: Router,
     public userData: UserData
-  ) { }
+  ) { 
+    App.addListener('backButton', data => {
+      if (data.canGoBack) {
+        window.history.back();
+      } else {
+        App.minimizeApp();
+      }
+    })
+  }
 
   ngAfterViewInit() {
     this.getUsername();

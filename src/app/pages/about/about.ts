@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { PopoverController } from '@ionic/angular';
 
 import { PopoverPage } from '../about-popover/about-popover';
+import { App } from '@capacitor/app';
 
 @Component({
   selector: 'page-about',
@@ -17,7 +18,15 @@ export class AboutPage {
     header: 'Select a Location'
   };
 
-  constructor(public popoverCtrl: PopoverController) { }
+  constructor(public popoverCtrl: PopoverController) { 
+    App.addListener('backButton', data => {
+      if (data.canGoBack) {
+        window.history.back();
+      } else {
+        App.minimizeApp();
+      }
+    })
+  }
 
   async presentPopover(event: Event) {
     const popover = await this.popoverCtrl.create({

@@ -18,26 +18,33 @@ import { UserData } from './providers/user-data';
   encapsulation: ViewEncapsulation.None
 })
 export class AppComponent implements OnInit {
-  appPages = [
+  isLoggedInPages = [
     {
-      title: 'Schedule',
-      url: '/app/tabs/schedule',
-      icon: 'calendar'
+      title: 'Productos',
+      url: '/app/tabs/products',
+      icon: 'storefront',
     },
     {
-      title: 'Speakers',
-      url: '/app/tabs/speakers',
-      icon: 'people'
+      title: 'Clientes',
+      url: '/app/tabs/clients',
+      icon: 'people',
     },
     {
-      title: 'Map',
-      url: '/app/tabs/map',
-      icon: 'map'
+      title: 'Carrito',
+      url: '/app/tabs/cart',
+      icon: 'cart',
     },
     {
-      title: 'About',
+      title: 'Información',
       url: '/app/tabs/about',
-      icon: 'information-circle'
+      icon: 'information-circle',
+    }
+  ];
+  isLoggedOutPages = [
+    {
+      title: 'Información',
+      url: '/app/tabs/about',
+      icon: 'information-circle',
     }
   ];
   loggedIn = false;
@@ -57,7 +64,7 @@ export class AppComponent implements OnInit {
 
   async ngOnInit() {
     await this.storage.create();
-    this.checkLoginStatus();
+    await this.checkLoginStatus();
     this.listenForLoginEvents();
 
     this.swUpdate.versionUpdates.subscribe(async res => {
@@ -92,6 +99,7 @@ export class AppComponent implements OnInit {
 
   checkLoginStatus() {
     return this.userData.isLoggedIn().then(loggedIn => {
+      this.router.navigateByUrl('/app/tabs/products');
       return this.updateLoggedInStatus(loggedIn);
     });
   }
@@ -118,7 +126,7 @@ export class AppComponent implements OnInit {
 
   logout() {
     this.userData.logout().then(() => {
-      return this.router.navigateByUrl('/app/tabs/schedule');
+      return this.router.navigateByUrl('/login');
     });
   }
 

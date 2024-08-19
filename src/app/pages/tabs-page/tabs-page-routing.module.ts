@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { TabsPage } from './tabs-page';
 import { SchedulePage } from '../schedule/schedule';
-import { ProductsPage } from '../products/products'
 
 
 const routes: Routes = [
@@ -24,28 +23,20 @@ const routes: Routes = [
         ]
       },
       {
-        path: 'speakers',
+        path: 'clients',
         children: [
           {
             path: '',
-            loadChildren: () => import('../speaker-list/speaker-list.module').then(m => m.SpeakerListModule)
-          },
-          {
-            path: 'session/:sessionId',
-            loadChildren: () => import('../session-detail/session-detail.module').then(m => m.SessionDetailModule)
-          },
-          {
-            path: 'speaker-details/:speakerId',
-            loadChildren: () => import('../speaker-detail/speaker-detail.module').then(m => m.SpeakerDetailModule)
+            loadChildren: () => import('../clients/clients.module').then(m => m.ClientsModule)
           }
         ]
       },
       {
-        path: 'map',
+        path: 'cart',
         children: [
           {
             path: '',
-            loadChildren: () => import('../map/map.module').then(m => m.MapModule)
+            loadChildren: () => import('../cart/cart.module').then(m => m.CartModule)
           }
         ]
       },

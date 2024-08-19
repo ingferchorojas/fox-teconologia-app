@@ -12,6 +12,8 @@ import { ProductsModule } from '../products/products.module';
 import { SessionDetailModule } from '../session-detail/session-detail.module';
 import { SpeakerDetailModule } from '../speaker-detail/speaker-detail.module';
 import { SpeakerListModule } from '../speaker-list/speaker-list.module';
+import { ClientsModule } from '../clients/clients.module'
+import { CartModule } from '../cart/cart.module'
 
 @NgModule({
   imports: [
@@ -24,7 +26,9 @@ import { SpeakerListModule } from '../speaker-list/speaker-list.module';
     SessionDetailModule,
     SpeakerDetailModule,
     SpeakerListModule,
-    TabsPageRoutingModule
+    TabsPageRoutingModule,
+    ClientsModule,
+    CartModule
   ],
   declarations: [
     TabsPage,

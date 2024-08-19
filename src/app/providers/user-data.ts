@@ -29,12 +29,26 @@ export class UserData {
     }
   }
 
-  login(username: string): Promise<any> {
-    return this.storage.set(this.HAS_LOGGED_IN, true).then(() => {
-      this.setUsername(username);
-      return window.dispatchEvent(new CustomEvent('user:login'));
-    });
-  }
+  login(username: string, password: string): Promise<any> {
+    // Lista de combinaciones de usuario y contraseña válidas
+    const validCredentials = [
+        { user: "movil1", pass: "123" },
+        { user: "movil2", pass: "123" },
+        // Agrega más combinaciones si es necesario
+    ];
+
+    // Verifica si la combinación de usuario y contraseña es válida
+    const isValid = validCredentials.some(cred => cred.user === username && cred.pass === password);
+
+    if (isValid) {
+        return this.storage.set(this.HAS_LOGGED_IN, true).then(() => {
+            this.setUsername(username);
+            return window.dispatchEvent(new CustomEvent('user:login'));
+        });
+    } else {
+        return Promise.reject('Invalid username or password');
+    }
+}
 
   signup(username: string): Promise<any> {
     return this.storage.set(this.HAS_LOGGED_IN, true).then(() => {

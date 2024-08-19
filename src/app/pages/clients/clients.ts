@@ -6,11 +6,11 @@ import { ConferenceData } from '../../providers/conference-data';
 import { UserData } from '../../providers/user-data';
 
 @Component({
-  selector: 'page-products',
-  templateUrl: 'products.html',
-  styleUrls: ['./products.scss'],
+  selector: 'page-clients',
+  templateUrl: 'clients.html',
+  styleUrls: ['./clients.scss'],
 })
-export class ProductsPage implements OnInit {
+export class ClientsPage implements OnInit {
   // Gets a reference to the list element
   @ViewChild('scheduleList', { static: true }) scheduleList: IonList;
 
@@ -35,7 +35,6 @@ export class ProductsPage implements OnInit {
     public user: UserData,
     public config: Config
   ) { 
-    
   }
 
   ngOnInit() {
