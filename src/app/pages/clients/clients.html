@@ -16,10 +16,29 @@
 <ion-content fullscreen="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Schedule</ion-title>
+      <ion-title size="large">Clientes</ion-title>
     </ion-toolbar>
     <ion-toolbar>
       <ion-searchbar [(ngModel)]="queryText" (ionInput)="updateSchedule()" placeholder="Search"></ion-searchbar>
     </ion-toolbar>
   </ion-header>
+
+  <ion-list>
+    <ion-item *ngFor="let customer of customers" [ngClass]="{'selected': customer.selected}" (click)="selectCustomer(customer)">
+      <ion-thumbnail slot="start">
+        <img src="../../../assets/img/customers.png" alt="{{customer.name}}">
+      </ion-thumbnail>
+      <ion-label>
+        <h2>{{ customer.name }}</h2>
+        <p>{{ customer.email }}</p>
+      </ion-label>
+      <ion-button slot="end" fill="outline" color="primary">
+        {{ customer.selected ? 'Seleccionado' : 'Seleccionar' }}
+      </ion-button>
+    </ion-item>
+  </ion-list>
+
+  <ion-button expand="block" color="primary" (click)="finalizeSale()">
+    Finalizar venta
+  </ion-button>
 </ion-content>

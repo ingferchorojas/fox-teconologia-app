@@ -4,6 +4,7 @@ import { AlertController, IonList, IonRouterOutlet, LoadingController, ModalCont
 
 import { ConferenceData } from '../../providers/conference-data';
 import { UserData } from '../../providers/user-data';
+import { App } from '@capacitor/app';
 
 @Component({
   selector: 'page-clients',
@@ -24,6 +25,12 @@ export class ClientsPage implements OnInit {
   confDate: string;
   showSearchbar: boolean;
 
+  customers = [
+    { name: 'Cliente A', email: 'clienteA@example.com', selected: false },
+    { name: 'Cliente B', email: 'clienteB@example.com', selected: false },
+    { name: 'Cliente C', email: 'clienteC@example.com', selected: false }
+  ];
+
   constructor(
     public alertCtrl: AlertController,
     public confData: ConferenceData,
@@ -35,6 +42,13 @@ export class ClientsPage implements OnInit {
     public user: UserData,
     public config: Config
   ) { 
+    App.addListener('backButton', data => {
+      if (data.canGoBack) {
+        window.history.back();
+      } else {
+        App.minimizeApp();
+      }
+    })
   }
 
   ngOnInit() {
@@ -42,6 +56,18 @@ export class ClientsPage implements OnInit {
 
     this.ios = this.config.get('mode') === 'ios';
   }
+  
+  selectCustomer(customer) {
+    this.customers.forEach(c => c.selected = false); // Deseleccionar todos los clientes
+    customer.selected = true; // Seleccionar el cliente clickeado
+  }
+
+
+  finalizeSale() {
+    // Manejar la acción cuando se hace clic en el botón "Finalizar venta"
+    console.log('Venta finalizada');
+  }
+
 
   updateSchedule() {
     // Close any open sliding items when the schedule updates

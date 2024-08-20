@@ -11,6 +11,7 @@ import { Storage } from '@ionic/storage-angular';
 
 import { UserData } from './providers/user-data';
 
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -41,11 +42,6 @@ export class AppComponent implements OnInit {
     }
   ];
   isLoggedOutPages = [
-    {
-      title: 'Información',
-      url: '/app/tabs/about',
-      icon: 'information-circle',
-    }
   ];
   loggedIn = false;
   dark = false;

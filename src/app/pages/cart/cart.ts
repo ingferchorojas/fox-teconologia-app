@@ -4,6 +4,7 @@ import { AlertController, IonList, IonRouterOutlet, LoadingController, ModalCont
 
 import { ConferenceData } from '../../providers/conference-data';
 import { UserData } from '../../providers/user-data';
+import { App } from '@capacitor/app';
 
 @Component({
   selector: 'page-cart',
@@ -35,6 +36,13 @@ export class CartPage implements OnInit {
     public user: UserData,
     public config: Config
   ) { 
+    App.addListener('backButton', data => {
+      if (data.canGoBack) {
+        window.history.back();
+      } else {
+        App.minimizeApp();
+      }
+    })
   }
 
   ngOnInit() {

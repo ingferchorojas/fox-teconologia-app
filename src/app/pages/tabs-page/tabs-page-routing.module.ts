@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { TabsPage } from './tabs-page';
 import { SchedulePage } from '../schedule/schedule';
+import { AuthGuard } from '../../providers/auth.guard'
 
 
 const routes: Routes = [
@@ -27,7 +28,8 @@ const routes: Routes = [
         children: [
           {
             path: '',
-            loadChildren: () => import('../clients/clients.module').then(m => m.ClientsModule)
+            loadChildren: () => import('../clients/clients.module').then(m => m.ClientsModule),
+            canActivate: [AuthGuard]
           }
         ]
       },
@@ -36,7 +38,8 @@ const routes: Routes = [
         children: [
           {
             path: '',
-            loadChildren: () => import('../cart/cart.module').then(m => m.CartModule)
+            loadChildren: () => import('../cart/cart.module').then(m => m.CartModule),
+            canActivate: [AuthGuard]
           }
         ]
       },
@@ -54,13 +57,14 @@ const routes: Routes = [
         children: [
           {
             path: '',
-            loadChildren: () => import('../products/products.module').then(m => m.ProductsModule)
+            loadChildren: () => import('../products/products.module').then(m => m.ProductsModule),
+            canActivate: [AuthGuard]
           }
         ]
       },
       {
         path: '',
-        redirectTo: '/app/tabs/schedule',
+        redirectTo: '/app/tabs/products',
         pathMatch: 'full'
       }
     ]

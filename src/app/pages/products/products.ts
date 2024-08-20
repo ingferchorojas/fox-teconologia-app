@@ -4,6 +4,7 @@ import { AlertController, IonList, IonRouterOutlet, LoadingController, ModalCont
 
 import { ConferenceData } from '../../providers/conference-data';
 import { UserData } from '../../providers/user-data';
+import { App } from '@capacitor/app';
 
 @Component({
   selector: 'page-products',
@@ -24,6 +25,12 @@ export class ProductsPage implements OnInit {
   confDate: string;
   showSearchbar: boolean;
 
+  products = [
+    { name: 'Producto A', stock: 10, added: 0 },
+    { name: 'Producto B', stock: 5, added: 0 },
+    { name: 'Producto C', stock: 20, added: 0 }
+  ];
+
   constructor(
     public alertCtrl: AlertController,
     public confData: ConferenceData,
@@ -35,13 +42,31 @@ export class ProductsPage implements OnInit {
     public user: UserData,
     public config: Config
   ) { 
-    
+    App.addListener('backButton', data => {
+      if (data.canGoBack) {
+        window.history.back();
+      } else {
+        App.minimizeApp();
+      }
+    })
   }
 
   ngOnInit() {
     this.updateSchedule();
 
     this.ios = this.config.get('mode') === 'ios';
+  }
+
+  selectCustomer() {
+    // Aquí puedes manejar la acción cuando se hace clic en el botón "Seleccionar cliente"
+    console.log('Cliente seleccionado');
+  }
+
+  addProduct(product) {
+    if (product.stock > 0) {
+      product.stock--;
+      product.added++;
+    }
   }
 
   updateSchedule() {

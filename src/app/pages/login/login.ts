@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 
 import { UserData } from '../../providers/user-data';
 import { UserOptions } from '../../interfaces/user-options';
+import { App } from '@capacitor/app';
 
 @Component({
   selector: 'page-login',
@@ -19,7 +20,13 @@ export class LoginPage implements OnInit {
     public userData: UserData,
     public router: Router
   ) {
-
+    App.addListener('backButton', data => {
+      if (data.canGoBack) {
+        window.history.back();
+      } else {
+        App.minimizeApp();
+      }
+    })
   }
 
   async ngOnInit() {
@@ -49,9 +56,9 @@ export class LoginPage implements OnInit {
     const loggedIn = await this.userData.isLoggedIn();
     this.updateLoggedInStatus(loggedIn);
 
-    if (loggedIn) {
-      this.router.navigateByUrl('/app/tabs/products');
-    }
+    // if (loggedIn) {
+    //   this.router.navigateByUrl('/app/tabs/products');
+    // }
   }
 
   updateLoggedInStatus(loggedIn: boolean) {
