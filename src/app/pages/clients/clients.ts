@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController, LoadingController, ModalController, ToastController, Config } from '@ionic/angular';
 import { App } from '@capacitor/app';
-
 @Component({
   selector: 'page-clients',
   templateUrl: 'clients.html',
@@ -38,13 +37,42 @@ export class ClientsPage implements OnInit {
     public toastCtrl: ToastController,
     public config: Config
   ) { 
-    App.addListener('backButton', data => {
-      if (data.canGoBack) {
-        window.history.back();
+    App.addListener('backButton', async () => {
+      // Obtén la ruta actual
+      const currentUrl = this.router.url;
+
+      // Verifica si la ruta es la que deseas controlar
+      if (currentUrl === '/app/tabs/clients') { // Ajusta esto según la ruta de tu página
+        const alert = await this.alertCtrl.create({
+          header: 'Salir de la aplicación',
+          message: '¿Estás seguro de que quieres salir?',
+          buttons: [
+            {
+              text: 'Cancelar',
+              role: 'cancel',
+              handler: () => {
+                // No hacer nada si el usuario cancela
+              }
+            },
+            {
+              text: 'Salir',
+              handler: () => {
+                // Minimizar la app si el usuario confirma
+                App.minimizeApp();
+              }
+            }
+          ]
+        });
+        await alert.present();
       } else {
-        App.minimizeApp();
+        // Si no estás en la página específica, maneja el botón de retroceso de la forma habitual
+        if (window.history.length > 1) {
+          window.history.back();
+        } else {
+          App.minimizeApp();
+        }
       }
-    })
+    });
   }
 
   ngOnInit() {
