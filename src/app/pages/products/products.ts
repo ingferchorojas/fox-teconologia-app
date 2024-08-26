@@ -26,10 +26,10 @@ export class ProductsPage implements OnInit {
   showSearchbar: boolean;
 
   products = [
-    { name: 'Producto A', stock: 10, added: 0 },
-    { name: 'Producto B', stock: 5, added: 0 },
-    { name: 'Producto C', stock: 20, added: 0 }
-  ];
+    { name: 'Producto A', stock: 10, added: 0, price: 100 },
+    { name: 'Producto B', stock: 5, added: 0, price: 200 },
+    { name: 'Producto C', stock: 20, added: 0, price: 300 }
+  ];  
 
   constructor(
     public alertCtrl: AlertController,
@@ -68,6 +68,13 @@ export class ProductsPage implements OnInit {
       product.added++;
     }
   }
+
+  removeProduct(product) {
+    if (product.added > 0) {
+      product.added--;
+      product.stock++;
+    }
+  }  
 
   updateSchedule() {
     // Close any open sliding items when the schedule updates

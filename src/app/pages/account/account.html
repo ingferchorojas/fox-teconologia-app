@@ -9,11 +9,12 @@
 
 <ion-content>
   <div *ngIf="username" class="ion-padding-top ion-text-center">
-    <img src="https://www.gravatar.com/avatar?d=mm&s=140" alt="avatar">
+    <img src="../../../assets/img/usuario.png" alt="avatar">
     <h2>{{username}}</h2>
 
     <ion-list inset>
-      <ion-item (click)="logout()">Logout</ion-item>
+      <ion-item (click)="changePassword()">Cambiar contraseña</ion-item>
+      <ion-item (click)="logout()">Salir</ion-item>
     </ion-list>
   </div>
 </ion-content>

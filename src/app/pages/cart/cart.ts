@@ -1,9 +1,6 @@
-import { Component, ViewChild, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AlertController, IonList, IonRouterOutlet, LoadingController, ModalController, ToastController, Config } from '@ionic/angular';
-
-import { ConferenceData } from '../../providers/conference-data';
-import { UserData } from '../../providers/user-data';
+import { AlertController, LoadingController, ToastController, Config } from '@ionic/angular';
 import { App } from '@capacitor/app';
 
 @Component({
@@ -12,28 +9,18 @@ import { App } from '@capacitor/app';
   styleUrls: ['./cart.scss'],
 })
 export class CartPage implements OnInit {
-  // Gets a reference to the list element
-  @ViewChild('scheduleList', { static: true }) scheduleList: IonList;
-
   ios: boolean;
-  dayIndex = 0;
   queryText = '';
-  segment = 'all';
-  excludeTracks: any = [];
-  shownSessions: any = [];
-  groups: any = [];
-  confDate: string;
   showSearchbar: boolean;
+
+  productosSeleccionados: any[] = [];
+  clienteSeleccionado: any = null;
 
   constructor(
     public alertCtrl: AlertController,
-    public confData: ConferenceData,
     public loadingCtrl: LoadingController,
-    public modalCtrl: ModalController,
-    public router: Router,
-    public routerOutlet: IonRouterOutlet,
     public toastCtrl: ToastController,
-    public user: UserData,
+    public router: Router,
     public config: Config
   ) { 
     App.addListener('backButton', data => {
@@ -42,94 +29,89 @@ export class CartPage implements OnInit {
       } else {
         App.minimizeApp();
       }
-    })
-  }
-
-  ngOnInit() {
-    this.updateSchedule();
-
-    this.ios = this.config.get('mode') === 'ios';
-  }
-
-  updateSchedule() {
-    // Close any open sliding items when the schedule updates
-    if (this.scheduleList) {
-      this.scheduleList.closeSlidingItems();
-    }
-
-    this.confData.getTimeline(this.dayIndex, this.queryText, this.excludeTracks, this.segment).subscribe((data: any) => {
-      this.shownSessions = data.shownSessions;
-      this.groups = data.groups;
     });
   }
 
-  async presentFilter() {
+  ngOnInit() {
+    this.ios = this.config.get('mode') === 'ios';
+    this.loadCartData();
   }
 
-  async addFavorite(slidingItem: HTMLIonItemSlidingElement, sessionData: any) {
-    if (this.user.hasFavorite(sessionData.name)) {
-      // Prompt to remove favorite
-      this.removeFavorite(slidingItem, sessionData, 'Favorite already added');
+  loadCartData() {
+    this.productosSeleccionados = [
+      { nombre: 'Producto A', precio: 10, cantidad: 2, stock: 10, imagen: '../../../assets/img/package.png' },
+      { nombre: 'Producto B', precio: 20, cantidad: 1, stock: 5, imagen: '../../../assets/img/package.png' },
+      { nombre: 'Producto C', precio: 15, cantidad: 1, stock: 5, imagen: '../../../assets/img/package.png' }
+    ];
+    this.clienteSeleccionado = {
+      nombre: 'Cliente Ejemplo',
+      telefono: '123456789',
+      coordenadas: 'geo:0,0'
+    };
+  }
+
+  addProduct(producto: any) {
+    console.log('Producto antes de añadir:', producto);
+    if (producto && producto.stock > 0) {
+      producto.cantidad++;
+      producto.stock--;
+      console.log('Producto después de añadir:', producto);
     } else {
-      // Add as a favorite
-      this.user.addFavorite(sessionData.name);
-
-      // Close the open item
-      slidingItem.close();
-
-      // Create a toast
-      const toast = await this.toastCtrl.create({
-        header: `${sessionData.name} was successfully added as a favorite.`,
-        duration: 3000,
-        buttons: [{
-          text: 'Close',
-          role: 'cancel'
-        }]
-      });
-
-      // Present the toast at the bottom of the page
-      await toast.present();
+      console.log('No se puede añadir el producto. Stock insuficiente.');
     }
-
   }
 
-  async removeFavorite(slidingItem: HTMLIonItemSlidingElement, sessionData: any, title: string) {
+  removeProduct(producto: any) {
+    console.log('Producto antes de eliminar:', producto);
+    if (producto && producto.cantidad > 0) {
+      producto.cantidad--;
+      producto.stock++;
+      console.log('Producto después de eliminar:', producto);
+    } else {
+      console.log('No se puede eliminar el producto. Cantidad insuficiente.');
+    }
+  }
+
+  async openMap(coordenadas: string) {
+    window.open(coordenadas, '_system');
+  }
+
+  async finalizarVenta() {
     const alert = await this.alertCtrl.create({
-      header: title,
-      message: 'Would you like to remove this session from your favorites?',
+      header: 'Finalizar Venta',
+      message: '¿Estás seguro de que quieres finalizar la venta?',
       buttons: [
         {
-          text: 'Cancel',
-          handler: () => {
-            // they clicked the cancel button, do not remove the session
-            // close the sliding item and hide the option buttons
-            slidingItem.close();
-          }
+          text: 'Cancelar',
+          role: 'cancel'
         },
         {
-          text: 'Remove',
+          text: 'Finalizar',
           handler: () => {
-            // they want to remove this session from their favorites
-            this.user.removeFavorite(sessionData.name);
-            this.updateSchedule();
-
-            // close the sliding item and hide the option buttons
-            slidingItem.close();
+            this.showSuccessMessage('Venta finalizada con éxito.');
           }
         }
       ]
     });
-    // now present the alert on top of all other content
     await alert.present();
   }
 
-  async openSocial(network: string, fab: HTMLIonFabElement) {
-    const loading = await this.loadingCtrl.create({
-      message: `Posting to ${network}`,
-      duration: (Math.random() * 1000) + 500
+  async showSuccessMessage(message: string) {
+    const toast = await this.toastCtrl.create({
+      header: message,
+      duration: 3000,
+      buttons: [{
+        text: 'Cerrar',
+        role: 'cancel'
+      }]
     });
-    await loading.present();
-    await loading.onWillDismiss();
-    fab.close();
+    await toast.present();
+  }
+
+  cambiarCliente() {
+    // Lógica para cambiar el cliente
+    console.log('Cambiar cliente');
+    // Puedes abrir un modal o redirigir a una página para seleccionar un nuevo cliente
+    this.router.navigate(['/app/tabs/clients']);
   }
 }

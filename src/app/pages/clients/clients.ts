@@ -1,9 +1,6 @@
-import { Component, ViewChild, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AlertController, IonList, IonRouterOutlet, LoadingController, ModalController, ToastController, Config } from '@ionic/angular';
-
-import { ConferenceData } from '../../providers/conference-data';
-import { UserData } from '../../providers/user-data';
+import { AlertController, LoadingController, ModalController, ToastController, Config } from '@ionic/angular';
 import { App } from '@capacitor/app';
 
 @Component({
@@ -12,34 +9,33 @@ import { App } from '@capacitor/app';
   styleUrls: ['./clients.scss'],
 })
 export class ClientsPage implements OnInit {
-  // Gets a reference to the list element
-  @ViewChild('scheduleList', { static: true }) scheduleList: IonList;
-
   ios: boolean;
-  dayIndex = 0;
   queryText = '';
-  segment = 'all';
-  excludeTracks: any = [];
-  shownSessions: any = [];
-  groups: any = [];
-  confDate: string;
-  showSearchbar: boolean;
+  segment = 'list'; // Default segment
+  showSearchbar = false;
 
+  // Datos de clientes existentes
   customers = [
-    { name: 'Cliente A', email: 'clienteA@example.com', selected: false },
-    { name: 'Cliente B', email: 'clienteB@example.com', selected: false },
-    { name: 'Cliente C', email: 'clienteC@example.com', selected: false }
+    { name: 'Cliente A', phone: '+595 123 456', selected: false, coordinates: { lat: -25.2637, lng: -57.5759 } },
+    { name: 'Cliente B', phone: '+595 234 567', selected: false, coordinates: { lat: -25.2844, lng: -57.6117 } },
+    { name: 'Cliente C', phone: '+595 345 678', selected: false, coordinates: { lat: -25.3007, lng: -57.6359 } }
   ];
+
+  // Datos para el nuevo cliente
+  newCustomer = {
+    name: '',
+    address: '',
+    phone: '',
+    latitude: null,
+    longitude: null
+  };
 
   constructor(
     public alertCtrl: AlertController,
-    public confData: ConferenceData,
     public loadingCtrl: LoadingController,
     public modalCtrl: ModalController,
     public router: Router,
-    public routerOutlet: IonRouterOutlet,
     public toastCtrl: ToastController,
-    public user: UserData,
     public config: Config
   ) { 
     App.addListener('backButton', data => {
@@ -52,93 +48,78 @@ export class ClientsPage implements OnInit {
   }
 
   ngOnInit() {
-    this.updateSchedule();
-
     this.ios = this.config.get('mode') === 'ios';
+    this.updateView(); // Ensure initial view setup
+    this.logCurrentRoute();
   }
-  
+
+  logCurrentRoute() {
+    console.log('Current route:', this.router.url);
+  }
+
+  updateView() {
+    if (this.segment === 'list') {
+      // Update view for the list of customers if necessary
+      // Example: this.updateSchedule(); or any other necessary updates
+    } else if (this.segment === 'add') {
+      // Update view for adding new customers
+      // Example: initialize form data or reset states
+      this.newCustomer = {
+        name: '',
+        address: '',
+        phone: '',
+        latitude: null,
+        longitude: null
+      };
+    }
+  }
+
   selectCustomer(customer) {
     this.customers.forEach(c => c.selected = false); // Deseleccionar todos los clientes
     customer.selected = true; // Seleccionar el cliente clickeado
   }
 
-
-  finalizeSale() {
-    // Manejar la acción cuando se hace clic en el botón "Finalizar venta"
-    console.log('Venta finalizada');
-  }
-
-
-  updateSchedule() {
-    // Close any open sliding items when the schedule updates
-    if (this.scheduleList) {
-      this.scheduleList.closeSlidingItems();
-    }
-
-    this.confData.getTimeline(this.dayIndex, this.queryText, this.excludeTracks, this.segment).subscribe((data: any) => {
-      this.shownSessions = data.shownSessions;
-      this.groups = data.groups;
-    });
+  openMap(coordinates) {
+    const { lat, lng } = coordinates;
+    const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+    window.open(url, '_blank');
   }
 
   async presentFilter() {
+    // Implement your filter functionality here
   }
 
-  async addFavorite(slidingItem: HTMLIonItemSlidingElement, sessionData: any) {
-    if (this.user.hasFavorite(sessionData.name)) {
-      // Prompt to remove favorite
-      this.removeFavorite(slidingItem, sessionData, 'Favorite already added');
+  confirmSelection() {
+    const selectedCustomer = this.customers.find(customer => customer.selected);
+    if (selectedCustomer) {
+      // Aquí puedes hacer algo con el cliente seleccionado, por ejemplo, navegar a otra página o mostrar una alerta
+      console.log('Cliente seleccionado:', selectedCustomer);
+      // Ejemplo: Mostrar una alerta de confirmación
+      this.alertCtrl.create({
+        header: 'Confirmación',
+        message: `¿Estás seguro de que quieres confirmar a ${selectedCustomer.name}?`,
+        buttons: [
+          {
+            text: 'Cancelar',
+            role: 'cancel'
+          },
+          {
+            text: 'Confirmar',
+            handler: () => {
+              // Aquí puedes manejar la confirmación, como enviar los datos a un servidor
+              console.log('Confirmado:', selectedCustomer);
+            }
+          }
+        ]
+      }).then(alert => alert.present());
     } else {
-      // Add as a favorite
-      this.user.addFavorite(sessionData.name);
-
-      // Close the open item
-      slidingItem.close();
-
-      // Create a toast
-      const toast = await this.toastCtrl.create({
-        header: `${sessionData.name} was successfully added as a favorite.`,
-        duration: 3000,
-        buttons: [{
-          text: 'Close',
-          role: 'cancel'
-        }]
-      });
-
-      // Present the toast at the bottom of the page
-      await toast.present();
+      // No hay cliente seleccionado
+      this.alertCtrl.create({
+        header: 'Error',
+        message: 'Por favor, selecciona un cliente.',
+        buttons: ['OK']
+      }).then(alert => alert.present());
     }
-
-  }
-
-  async removeFavorite(slidingItem: HTMLIonItemSlidingElement, sessionData: any, title: string) {
-    const alert = await this.alertCtrl.create({
-      header: title,
-      message: 'Would you like to remove this session from your favorites?',
-      buttons: [
-        {
-          text: 'Cancel',
-          handler: () => {
-            // they clicked the cancel button, do not remove the session
-            // close the sliding item and hide the option buttons
-            slidingItem.close();
-          }
-        },
-        {
-          text: 'Remove',
-          handler: () => {
-            // they want to remove this session from their favorites
-            this.user.removeFavorite(sessionData.name);
-            this.updateSchedule();
-
-            // close the sliding item and hide the option buttons
-            slidingItem.close();
-          }
-        }
-      ]
-    });
-    // now present the alert on top of all other content
-    await alert.present();
   }
 
   async openSocial(network: string, fab: HTMLIonFabElement) {
@@ -149,5 +130,38 @@ export class ClientsPage implements OnInit {
     await loading.present();
     await loading.onWillDismiss();
     fab.close();
+  }
+
+  // Manejar el envío del formulario
+  submitForm() {
+    if (this.newCustomer.name && this.newCustomer.address && this.newCustomer.phone && this.newCustomer.latitude !== null && this.newCustomer.longitude !== null) {
+      // Aquí puedes manejar el envío del formulario, como enviar los datos a un servidor
+      console.log('Nuevo Cliente:', this.newCustomer);
+      
+      // Agregar el nuevo cliente a la lista
+      this.customers.push({
+        ...this.newCustomer,
+        selected: false,
+        coordinates: { lat: this.newCustomer.latitude, lng: this.newCustomer.longitude }
+      });
+
+      // Resetea el formulario después de enviarlo
+      this.newCustomer = {
+        name: '',
+        address: '',
+        phone: '',
+        latitude: null,
+        longitude: null
+      };
+
+      // Cambia el segmento a la lista después de agregar
+      this.segment = 'list';
+    } else {
+      this.alertCtrl.create({
+        header: 'Error',
+        message: 'Por favor, complete todos los campos.',
+        buttons: ['OK']
+      }).then(alert => alert.present());
+    }
   }
 }
