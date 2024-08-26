@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { LoginGuard } from '../../providers/login.guard'
+import { LoginGuard } from '../../providers/login.guard';
 
 import { LoginPage } from './login';
 
