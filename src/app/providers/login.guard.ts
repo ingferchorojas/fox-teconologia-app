@@ -17,7 +17,7 @@ export class LoginGuard implements CanActivate {
 
     return this.checkUserNotLoggedIn().then(isNotLoggedIn => {
       if (!isNotLoggedIn) {
-        this.router.navigate(['/app/tabs/products']); // Redirige a la ruta 'app' si ya está logueado
+        this.router.navigate(['/app/tabs/clients']); // Redirige a la ruta 'app' si ya está logueado
         return false;
       } 
       return true;

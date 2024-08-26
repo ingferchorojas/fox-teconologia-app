@@ -21,14 +21,14 @@ import { UserData } from './providers/user-data';
 export class AppComponent implements OnInit {
   isLoggedInPages = [
     {
-      title: 'Productos',
-      url: '/app/tabs/products',
-      icon: 'storefront',
-    },
-    {
       title: 'Clientes',
       url: '/app/tabs/clients',
       icon: 'people',
+    },
+    {
+      title: 'Productos',
+      url: '/app/tabs/products',
+      icon: 'storefront',
     },
     {
       title: 'Carrito',
@@ -95,7 +95,6 @@ export class AppComponent implements OnInit {
 
   checkLoginStatus() {
     return this.userData.isLoggedIn().then(loggedIn => {
-      this.router.navigateByUrl('/app/tabs/products');
       return this.updateLoggedInStatus(loggedIn);
     });
   }
