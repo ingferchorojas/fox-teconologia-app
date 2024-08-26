@@ -93,6 +93,12 @@ export class UserData {
     });
   }
 
+  getToken(): Promise<string> {
+    return this.storage.get('token').then((value) => {
+      return value;
+    });
+  }
+
   isLoggedIn(): Promise<boolean> {
     return this.storage.get(this.HAS_LOGGED_IN).then((value) => {
       return value === true;

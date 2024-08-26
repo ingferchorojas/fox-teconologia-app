@@ -1,5 +1,6 @@
 <ion-header translucent="true">
   <ion-toolbar>
+    <ion-progress-bar *ngIf="loading" type="indeterminate"></ion-progress-bar>
     <ion-buttons slot="start">
       <ion-menu-button *ngIf="!showSearchbar"></ion-menu-button>
     </ion-buttons>
@@ -14,6 +15,9 @@
 </ion-header>
 
 <ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
   <ion-segment [(ngModel)]="segment" (ionChange)="updateView()">
     <ion-segment-button value="list">
       Lista de Clientes
@@ -47,7 +51,7 @@
           <ion-grid>
             <ion-row>
               <ion-col size="6">
-                <ion-button expand="block" color="primary" fill="outline" (click)="openMap(customer.coordinates)">
+                <ion-button expand="block" color="primary" fill="outline" (click)="openMap(customer.latitude, customer.longitude)">
                   <ion-icon slot="start" name="location-outline"></ion-icon>
                   Mapa
                 </ion-button>

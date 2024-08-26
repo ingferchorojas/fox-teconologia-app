@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController, LoadingController, ModalController, ToastController, Config } from '@ionic/angular';
 import { App } from '@capacitor/app';
+import { ClientData } from '../../providers/client-data'; // Ajusta la ruta al servicio
+
 @Component({
   selector: 'page-clients',
   templateUrl: 'clients.html',
@@ -13,12 +15,7 @@ export class ClientsPage implements OnInit {
   segment = 'list'; // Default segment
   showSearchbar = false;
 
-  // Datos de clientes existentes
-  customers = [
-    { name: 'Cliente A', phone: '+595 123 456', selected: false, coordinates: { lat: -25.2637, lng: -57.5759 } },
-    { name: 'Cliente B', phone: '+595 234 567', selected: false, coordinates: { lat: -25.2844, lng: -57.6117 } },
-    { name: 'Cliente C', phone: '+595 345 678', selected: false, coordinates: { lat: -25.3007, lng: -57.6359 } }
-  ];
+  customers = []; // Se cargará dinámicamente
 
   // Datos para el nuevo cliente
   newCustomer = {
@@ -29,13 +26,16 @@ export class ClientsPage implements OnInit {
     longitude: null
   };
 
+  loading = true
+
   constructor(
     public alertCtrl: AlertController,
     public loadingCtrl: LoadingController,
     public modalCtrl: ModalController,
     public router: Router,
     public toastCtrl: ToastController,
-    public config: Config
+    public config: Config,
+    private clientData: ClientData // Inyección del servicio ClientData
   ) { 
     App.addListener('backButton', async () => {
       // Obtén la ruta actual
@@ -79,6 +79,8 @@ export class ClientsPage implements OnInit {
     this.ios = this.config.get('mode') === 'ios';
     this.updateView(); // Ensure initial view setup
     this.logCurrentRoute();
+
+    this.loadCustomers(); // Cargar los clientes al iniciar
   }
 
   logCurrentRoute() {
@@ -88,10 +90,8 @@ export class ClientsPage implements OnInit {
   updateView() {
     if (this.segment === 'list') {
       // Update view for the list of customers if necessary
-      // Example: this.updateSchedule(); or any other necessary updates
     } else if (this.segment === 'add') {
-      // Update view for adding new customers
-      // Example: initialize form data or reset states
+      // Reset form for adding new customers
       this.newCustomer = {
         name: '',
         address: '',
@@ -102,14 +102,34 @@ export class ClientsPage implements OnInit {
     }
   }
 
+  async loadCustomers() {
+    try {
+      const data = await this.clientData.getClientData(); // Obtiene los datos desde el servicio
+      this.customers = data; // Asigna los datos a la lista de clientes
+      this.loading = false
+    } catch (error) {
+      this.loading = false
+      console.error('Error loading customers:', error);
+      this.alertCtrl.create({
+        header: 'Error',
+        message: 'No se pudieron cargar los clientes. Inténtelo de nuevo más tarde.',
+        buttons: ['OK']
+      }).then(alert => alert.present());
+    }
+  }
+
+  async handleRefresh(event: Event) {
+    await this.loadCustomers();
+    (event as CustomEvent).detail.complete(); // Completa el refresco
+  }
+
   selectCustomer(customer) {
     this.customers.forEach(c => c.selected = false); // Deseleccionar todos los clientes
     customer.selected = true; // Seleccionar el cliente clickeado
   }
 
-  openMap(coordinates) {
-    const { lat, lng } = coordinates;
-    const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+  openMap(latitude, longitude) {
+    const url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
     window.open(url, '_blank');
   }
 
