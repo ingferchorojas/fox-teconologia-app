@@ -11,7 +11,8 @@ const routes: Routes = [
   },
   {
     path: 'account',
-    loadChildren: () => import('./pages/account/account.module').then(m => m.AccountModule)
+    loadChildren: () => import('./pages/account/account.module').then(m => m.AccountModule),
+    canActivate: [AuthGuard]
   },
   {
     path: 'support',

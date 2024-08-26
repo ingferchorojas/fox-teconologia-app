@@ -48,7 +48,8 @@ const routes: Routes = [
         children: [
           {
             path: '',
-            loadChildren: () => import('../about/about.module').then(m => m.AboutModule)
+            loadChildren: () => import('../about/about.module').then(m => m.AboutModule),
+            canActivate: [AuthGuard]
           }
         ]
       },

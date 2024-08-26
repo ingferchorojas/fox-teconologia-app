@@ -67,12 +67,7 @@ export class UserData {
         return throwError(() => new Error(error.error.message ?? 'Signup failed. Please try again.'));
       })
     )).then(response => {
-      const token = response.data; // Ajusta según la estructura de la respuesta
-      // Manejar la respuesta del registro si es necesario
-      // Puedes optar por iniciar sesión automáticamente después del registro
-      return this.storage.set(this.HAS_LOGGED_IN, false).then(() => {
-        return window.dispatchEvent(new CustomEvent('user:signup'));
-      });
+      return {}
     });
   }
 

@@ -31,7 +31,7 @@ export class AppComponent implements OnInit {
       icon: 'storefront',
     },
     {
-      title: 'Carrito',
+      title: 'Venta',
       url: '/app/tabs/cart',
       icon: 'cart',
     },
