@@ -3,32 +3,34 @@
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-title>Signup</ion-title>
+    <ion-title>Registrarse</ion-title>
+    <ion-progress-bar *ngIf="loading" type="indeterminate"></ion-progress-bar>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
 
   <div class="signup-logo">
-    <img src="assets/img/appicon.svg" alt="Ionic Logo">
+    <img src="assets/img/appicon.png" alt="Fox logo">
   </div>
 
   <div class="signup-form">
     <form #signupForm="ngForm" novalidate>
       <ion-input
-        label="Username"
+        label="Usuario"
         labelPlacement="stacked"
         fill="solid"
         [(ngModel)]="signup.username"
         name="username"
         type="text"
         #username="ngModel"
-        errorText="Username is required"
+        pattern="[a-zA-Z0-9]+"
+        errorText="El usuario debe ser alfanumérico y no debe contener espacios"
         required>
       </ion-input>
 
       <ion-input
-        label="Password"
+        label="Contraseña"
         labelPlacement="stacked"
         fill="solid"
         [(ngModel)]="signup.password"
@@ -40,7 +42,7 @@
       </ion-input>
 
       <div class="ion-padding">
-        <ion-button (click)="onSignup(signupForm)" type="submit" expand="block">Create</ion-button>
+        <ion-button (click)="onSignup(signupForm)" type="submit" expand="block">Crear cuenta</ion-button>
       </div>
     </form>
   </div>

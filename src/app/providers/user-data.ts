@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage-angular';
-
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { catchError } from 'rxjs/operators';
+import { firstValueFrom, throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -9,9 +11,12 @@ export class UserData {
   favorites: string[] = [];
   HAS_LOGGED_IN = 'hasLoggedIn';
   HAS_SEEN_TUTORIAL = 'hasSeenTutorial';
+  private apiUrlLogin = 'http://100.26.210.128:3000/api/auth/login';
+  private apiUrlSignup = 'http://100.26.210.128:3000/api/auth/signup';
 
   constructor(
-    public storage: Storage
+    public storage: Storage,
+    private http: HttpClient
   ) { }
 
   hasFavorite(sessionName: string): boolean {
@@ -30,30 +35,44 @@ export class UserData {
   }
 
   login(username: string, password: string): Promise<any> {
-    // Lista de combinaciones de usuario y contraseña válidas
-    const validCredentials = [
-        { user: "movil1", pass: "123" },
-        { user: "movil2", pass: "123" },
-        // Agrega más combinaciones si es necesario
-    ];
+    const loginData = { username, password };
 
-    // Verifica si la combinación de usuario y contraseña es válida
-    const isValid = validCredentials.some(cred => cred.user === username && cred.pass === password);
-
-    if (isValid) {
+    return firstValueFrom(this.http.post<any>(this.apiUrlLogin, loginData, {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+    }).pipe(
+      catchError(error => {
+        return throwError(() => new Error('Invalid username or password'));
+      })
+    )).then(response => {
+      const token = response.data; // Ajusta según la estructura de la respuesta
+      if (token) {
         return this.storage.set(this.HAS_LOGGED_IN, true).then(() => {
-            this.setUsername(username);
-            return window.dispatchEvent(new CustomEvent('user:login'));
+          this.setUsername(username);
+          this.setToken(token);
+          return window.dispatchEvent(new CustomEvent('user:login'));
         });
-    } else {
-        return Promise.reject('Invalid username or password');
-    }
-}
+      } else {
+        return Promise.reject('Token not found in response');
+      }
+    });
+  }
 
-  signup(username: string): Promise<any> {
-    return this.storage.set(this.HAS_LOGGED_IN, true).then(() => {
-      this.setUsername(username);
-      return window.dispatchEvent(new CustomEvent('user:signup'));
+  signup(username: string, password: string): Promise<any> {
+    const signupData = { username, password };
+
+    return firstValueFrom(this.http.post<any>(this.apiUrlSignup, signupData, {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+    }).pipe(
+      catchError(error => {
+        return throwError(() => new Error(error.error.message ?? 'Signup failed. Please try again.'));
+      })
+    )).then(response => {
+      const token = response.data; // Ajusta según la estructura de la respuesta
+      // Manejar la respuesta del registro si es necesario
+      // Puedes optar por iniciar sesión automáticamente después del registro
+      return this.storage.set(this.HAS_LOGGED_IN, false).then(() => {
+        return window.dispatchEvent(new CustomEvent('user:signup'));
+      });
     });
   }
 
@@ -67,6 +86,10 @@ export class UserData {
 
   setUsername(username: string): Promise<any> {
     return this.storage.set('username', username);
+  }
+
+  setToken(token: string): Promise<any> {
+    return this.storage.set('token', token);
   }
 
   getUsername(): Promise<string> {

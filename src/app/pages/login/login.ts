@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
-
 import { UserData } from '../../providers/user-data';
 import { UserOptions } from '../../interfaces/user-options';
 import { App } from '@capacitor/app';
@@ -15,6 +14,7 @@ export class LoginPage implements OnInit {
   login: UserOptions = { username: '', password: '' };
   submitted = false;
   loggedIn = false;
+  loading = false; // Variable para manejar el estado de carga
 
   constructor(
     public userData: UserData,
@@ -26,7 +26,7 @@ export class LoginPage implements OnInit {
       } else {
         App.minimizeApp();
       }
-    })
+    });
   }
 
   async ngOnInit() {
@@ -35,16 +35,20 @@ export class LoginPage implements OnInit {
 
   onLogin(form: NgForm) {
     this.submitted = true;
+    this.loading = true; // Muestra la barra de progreso
 
     if (form.valid) {
       this.userData.login(this.login.username, this.login.password)
         .then(() => {
-          this.router.navigateByUrl('/app/tabs/products');
+          this.router.navigateByUrl('/app/tabs/clients');
         })
         .catch(error => {
           console.error(error);
+          this.loading = false
           alert('Usuario o contraseña incorrectos.');
-        });
+        })
+    } else {
+      this.loading = false; // Oculta la barra de progreso si el formulario no es válido
     }
   }
 
@@ -55,10 +59,6 @@ export class LoginPage implements OnInit {
   async checkLoginStatus() {
     const loggedIn = await this.userData.isLoggedIn();
     this.updateLoggedInStatus(loggedIn);
-
-    // if (loggedIn) {
-    //   this.router.navigateByUrl('/app/tabs/products');
-    // }
   }
 
   updateLoggedInStatus(loggedIn: boolean) {

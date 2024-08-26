@@ -5,6 +5,7 @@
     </ion-buttons>
 
     <ion-title>Iniciar sesión</ion-title>
+    <ion-progress-bar *ngIf="loading" type="indeterminate"></ion-progress-bar>
   </ion-toolbar>
 </ion-header>
 
@@ -41,12 +42,20 @@
           errorText="La contraseña es requerida"
           required>
         </ion-input>
-
-        <ion-row>
-          <ion-col>
-            <ion-button (click)="onLogin(loginForm)" type="submit" expand="block">Entrar</ion-button>
-          </ion-col>
-        </ion-row>
+        <div class="ion-padding">
+          <ion-row>
+            <ion-col>
+              <ion-button (click)="onLogin(loginForm)" type="submit" expand="block">Entrar</ion-button>
+            </ion-col>
+          </ion-row>
+          
+          <!-- Botón de registro -->
+          <ion-row>
+            <ion-col>
+              <ion-button (click)="onSignup()" expand="block" color="secondary">Registrarse</ion-button>
+            </ion-col>
+          </ion-row>
+        </div>
       </form>
     </div>
   </div>
