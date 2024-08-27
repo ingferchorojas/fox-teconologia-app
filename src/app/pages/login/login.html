@@ -45,7 +45,7 @@
         <div class="ion-padding">
           <ion-row>
             <ion-col>
-              <ion-button (click)="onLogin(loginForm)" type="submit" expand="block">Entrar</ion-button>
+              <ion-button (click)="onLogin(loginForm)" type="submit" expand="block" [disabled]="!loginForm.valid">Entrar</ion-button>
             </ion-col>
           </ion-row>
           

@@ -57,8 +57,8 @@ export class UserData {
     });
   }
 
-  signup(username: string, password: string): Promise<any> {
-    const signupData = { username, password };
+  signup(username: string, password: string, first_name: string, last_name: string, phone: string): Promise<any> {
+    const signupData = { username: username.trim(), password, first_name: first_name.trim(), last_name: last_name.trim(), phone: phone.trim() };
 
     return firstValueFrom(this.http.post<any>(this.apiUrlSignup, signupData, {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' })

@@ -17,6 +17,46 @@
   <div class="signup-form">
     <form #signupForm="ngForm" novalidate>
       <ion-input
+        label="Nombre"
+        labelPlacement="stacked"
+        fill="solid"
+        [(ngModel)]="signup.first_name"
+        name="first_name"
+        type="text"
+        #firstName="ngModel"
+        pattern="[a-zA-Z]+"
+        errorText="El nombre solo debe contener letras"
+        required>
+      </ion-input>
+
+      <ion-input
+        label="Apellido"
+        labelPlacement="stacked"
+        fill="solid"
+        [(ngModel)]="signup.last_name"
+        name="last_name"
+        type="text"
+        #lastName="ngModel"
+        pattern="[a-zA-Z]+"
+        errorText="El apellido solo debe contener letras"
+        required>
+      </ion-input>
+
+      <ion-input
+        label="Teléfono"
+        labelPlacement="stacked"
+        fill="solid"
+        [(ngModel)]="signup.phone"
+        name="phone"
+        type="text"
+        #phone="ngModel"
+        pattern="^0971[0-9]{6}$"
+        errorText="El teléfono debe tener el formato 0971422641"
+        placeholder="0971422641"
+        required>
+      </ion-input>
+
+      <ion-input
         label="Usuario"
         labelPlacement="stacked"
         fill="solid"
@@ -42,7 +82,24 @@
       </ion-input>
 
       <div class="ion-padding">
-        <ion-button (click)="onSignup(signupForm)" type="submit" expand="block">Crear cuenta</ion-button>
+        <ion-row>
+          <ion-col>
+            <ion-button 
+              (click)="onSignup(signupForm)" 
+              type="submit" 
+              expand="block" 
+              [disabled]="!signupForm.valid"> <!-- Deshabilitar hasta que el formulario sea válido -->
+              Crear cuenta
+            </ion-button>
+          </ion-col>
+        </ion-row>
+
+        <!-- Botón de registro -->
+        <ion-row>
+          <ion-col>
+            <ion-button (click)="onLogin()" expand="block" color="secondary">Ya tengo una cuenta</ion-button>
+          </ion-col>
+        </ion-row>
       </div>
     </form>
   </div>

@@ -12,7 +12,13 @@ import { AlertController } from '@ionic/angular';
   styleUrls: ['./signup.scss'],
 })
 export class SignupPage {
-  signup: UserOptions = { username: '', password: '' };
+  signup: UserOptions = { 
+    username: '', 
+    password: '', 
+    first_name: '', // Añadido para el nombre
+    last_name: '',  // Añadido para el apellido
+    phone: ''       // Añadido para el teléfono
+  };
   submitted = false;
   loading = false; // Añadido para mostrar un indicador de carga
 
@@ -48,8 +54,46 @@ export class SignupPage {
         return;
       }
 
+      // Verificar si el nombre cumple con los requisitos
+      const namePattern = /^[a-zA-Z]+$/;
+      if (!namePattern.test(this.signup.first_name)) {
+        const alert = await this.alertCtrl.create({
+          header: 'Error',
+          message: 'El nombre solo debe contener letras.',
+          buttons: ['OK']
+        });
+        await alert.present();
+        this.loading = false; // Ocultar indicador de carga
+        return;
+      }
+
+      // Verificar si el apellido cumple con los requisitos
+      if (!namePattern.test(this.signup.last_name)) {
+        const alert = await this.alertCtrl.create({
+          header: 'Error',
+          message: 'El apellido solo debe contener letras.',
+          buttons: ['OK']
+        });
+        await alert.present();
+        this.loading = false; // Ocultar indicador de carga
+        return;
+      }
+
+      // Verificar si el teléfono cumple con los requisitos
+      const phonePattern = /^0971[0-9]{6}$/;
+      if (!phonePattern.test(this.signup.phone)) {
+        const alert = await this.alertCtrl.create({
+          header: 'Error',
+          message: 'El teléfono debe tener el formato 0971422641.',
+          buttons: ['OK']
+        });
+        await alert.present();
+        this.loading = false; // Ocultar indicador de carga
+        return;
+      }
+
       try {
-        await this.userData.signup(this.signup.username, this.signup.password);
+        await this.userData.signup(this.signup.username, this.signup.password, this.signup.first_name, this.signup.last_name, this.signup.phone);
         
         // Mostrar alerta de éxito
         const alert = await this.alertCtrl.create({
@@ -78,5 +122,9 @@ export class SignupPage {
     } else {
       this.loading = false; // Ocultar indicador de carga si el formulario no es válido
     }
+  }
+
+  onLogin() {
+    this.router.navigateByUrl('/login')
   }
 }
