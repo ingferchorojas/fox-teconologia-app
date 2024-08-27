@@ -13,6 +13,7 @@ export class UserData {
   HAS_SEEN_TUTORIAL = 'hasSeenTutorial';
   private apiUrlLogin = 'http://100.26.210.128:3000/api/auth/login';
   private apiUrlSignup = 'http://100.26.210.128:3000/api/auth/signup';
+  private apitUrlChangePassword = 'http://100.26.210.128:3000/api/user/change-password';
 
   constructor(
     public storage: Storage,
@@ -78,6 +79,28 @@ export class UserData {
       window.dispatchEvent(new CustomEvent('user:logout'));
     });
   }
+
+  changePassword(username: string, oldPassword: string, newPassword: string): Promise<any> {
+    const changePasswordData = { username, oldPassword, newPassword };
+  
+    return this.getToken().then(token => {
+      if (!token) {
+        return Promise.reject('User is not authenticated.');
+      }
+  
+      const headers = new HttpHeaders({
+        'Content-Type': 'application/json',
+        'authorization': `Bearer ${token}`
+      });
+  
+      return firstValueFrom(this.http.post<any>(this.apitUrlChangePassword, changePasswordData, { headers })
+        .pipe(
+          catchError(error => {
+            return throwError(() => new Error(error.error.message ?? 'Password change failed. Please try again.'));
+          })
+        ));
+    });
+  }  
 
   setUsername(username: string): Promise<any> {
     return this.storage.set('username', username);

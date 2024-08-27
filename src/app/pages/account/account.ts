@@ -1,8 +1,6 @@
 import { AfterViewInit, Component } from '@angular/core';
 import { Router } from '@angular/router';
-
-import { AlertController } from '@ionic/angular';
-
+import { AlertController, ToastController } from '@ionic/angular';
 import { UserData } from '../../providers/user-data';
 import { App } from '@capacitor/app';
 
@@ -12,10 +10,13 @@ import { App } from '@capacitor/app';
   styleUrls: ['./account.scss'],
 })
 export class AccountPage implements AfterViewInit {
+
   username: string;
+  loading = true;
 
   constructor(
     public alertCtrl: AlertController,
+    public toastCtrl: ToastController, // Añadido para mostrar toasts
     public router: Router,
     public userData: UserData
   ) { 
@@ -30,15 +31,13 @@ export class AccountPage implements AfterViewInit {
 
   ngAfterViewInit() {
     this.getUsername();
+    this.loading = false;
   }
 
   updatePicture() {
     console.log('Clicked to update picture');
   }
 
-  // Present an alert with the current username populated
-  // clicking OK will update the username and display it
-  // clicking Cancel will close the alert and do nothing
   async changeUsername() {
     const alert = await this.alertCtrl.create({
       header: 'Change Username',
@@ -70,13 +69,99 @@ export class AccountPage implements AfterViewInit {
     });
   }
 
-  changePassword() {
-    console.log('Clicked to change password');
+  async changePassword() {
+    const alert = await this.alertCtrl.create({
+      header: 'Cambiar contraseña',
+      inputs: [
+        {
+          name: 'oldPassword',
+          type: 'password',
+          placeholder: 'Antigua contraseña',
+          attributes: {
+            minlength: 6,
+            required: true
+          },
+        },
+        {
+          name: 'newPassword',
+          type: 'password',
+          placeholder: 'Nueva contraseña',
+          attributes: {
+            minlength: 6,
+            required: true
+          },
+        },
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          handler: () => {
+            console.log('Cambio de contraseña cancelado');
+          }
+        },
+        {
+          text: 'Confirmar',
+          handler: async (data) => {
+            const { oldPassword, newPassword } = data;
+            
+            if (oldPassword && newPassword) {
+              try {
+                this.loading = true;
+                await this.userData.changePassword(this.username, oldPassword, newPassword);
+                this.loading = false;
+                // Mostrar toast de éxito
+                const toast = await this.toastCtrl.create({
+                  message: 'La contraseña se cambió correctamente.',
+                  duration: 2000,
+                  position: 'top'
+                });
+                await toast.present();
+              } catch (error) {
+                this.loading = false;
+                // Mostrar alerta de error
+                const errorAlert = await this.alertCtrl.create({
+                  header: 'Error',
+                  message: error.message || 'No se pudo cambiar la contraseña.',
+                  buttons: ['OK']
+                });
+                await errorAlert.present();
+              }
+            } else {
+              // Mostrar mensaje de error si alguno de los campos está vacío
+              alert.message = 'Ambos campos son obligatorios.';
+              return false; // Evitar que el alert se cierre si las validaciones fallan
+            }
+          }
+        }
+      ]
+    });
+  
+    await alert.present();
   }
-
-  logout() {
-    this.userData.logout();
-    this.router.navigateByUrl('/login');
+  
+  async logout() {
+    const alert = await this.alertCtrl.create({
+      header: 'Cerrar sesión',
+      message: '¿Estás seguro de que deseas cerrar sesión?',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          handler: () => {
+            console.log('Logout cancelado');
+          }
+        },
+        {
+          text: 'Cerrar sesión',
+          handler: () => {
+            this.userData.logout();
+            this.router.navigateByUrl('/login');
+          }
+        }
+      ]
+    });
+    await alert.present();
   }
 
   support() {
