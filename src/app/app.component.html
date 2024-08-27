@@ -19,14 +19,14 @@
           </div>
           <div *ngIf="loggedIn">
             <ion-menu-toggle autoHide="false" *ngFor="let p of isLoggedInPages; let i = index">
-            <ion-item [routerLink]="p.url" routerLinkActive="selected" routerDirection="root" detail="false">
-              <ion-icon slot="start" [name]="p.icon + '-outline'"></ion-icon>
-              <ion-label>
-                {{p.title}}
-              </ion-label>
-            </ion-item>
-          </ion-menu-toggle>
-        </div>
+              <ion-item [routerLink]="p.url" routerLinkActive="selected" routerDirection="root" detail="false">
+                <ion-icon slot="start" [name]="p.icon + '-outline'"></ion-icon>
+                <ion-label>
+                  {{p.title}}
+                </ion-label>
+              </ion-item>
+            </ion-menu-toggle>
+          </div>
         </ion-list>
 
         <ion-list *ngIf="loggedIn" lines="none">
@@ -54,7 +54,7 @@
 
           <ion-item>
             <ion-icon slot="start" name="moon-outline"></ion-icon>
-            <ion-toggle [(ngModel)]="dark">
+            <ion-toggle [(ngModel)]="dark" (ionChange)="toggleDarkMode()">
               Modo Oscuro
             </ion-toggle>
           </ion-item>
@@ -83,7 +83,7 @@
 
           <ion-item>
             <ion-icon slot="start" name="moon-outline"></ion-icon>
-            <ion-toggle [(ngModel)]="dark">
+            <ion-toggle [ngModel]="dark" (ionChange)="toggleDarkMode($event)">
               Modo Oscuro
             </ion-toggle>
           </ion-item>
@@ -95,5 +95,4 @@
     <ion-router-outlet id="main-content"></ion-router-outlet>
 
   </ion-split-pane>
-
 </ion-app>
