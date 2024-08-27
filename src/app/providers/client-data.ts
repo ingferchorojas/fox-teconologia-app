@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { UserData } from './user-data'; // Ajusta la ruta según la ubicación del servicio
-import { firstValueFrom } from 'rxjs'
+import { firstValueFrom } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -29,6 +29,23 @@ export class ClientData {
     } catch (error) {
       console.error('Error fetching client data:', error);
       return []; // Devuelve un array vacío en caso de error
+    }
+  }
+
+  async addClient(client: { name: string, address: string, phone: string, latitude: number, longitude: number }): Promise<any> {
+    try {
+      const token = await this.userData.getToken(); // Obtiene el token del servicio UserData
+      const headers = new HttpHeaders({
+        'Content-Type': 'application/json',
+        'authorization': `Bearer ${token}`
+      });
+
+      const response: any = await firstValueFrom(this.http.post(this.apiUrlClient, client, { headers }));
+      console.log('Cliente agregado:', response);
+      return response; // Devuelve la respuesta completa
+    } catch (error) {
+      console.error('Error adding client:', error);
+      throw error; // Lanza el error para que pueda ser manejado por el llamador
     }
   }
 }

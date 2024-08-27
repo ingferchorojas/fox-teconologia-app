@@ -181,35 +181,64 @@ export class ClientsPage implements OnInit {
   }
 
   // Manejar el envío del formulario
-  submitForm() {
-    if (this.newCustomer.name && this.newCustomer.address && this.newCustomer.phone && this.newCustomer.latitude !== null && this.newCustomer.longitude !== null) {
-      // Aquí puedes manejar el envío del formulario, como enviar los datos a un servidor
-      console.log('Nuevo Cliente:', this.newCustomer);
-      
-      // Agregar el nuevo cliente a la lista
-      this.customers.push({
-        ...this.newCustomer,
-        selected: false,
-        coordinates: { lat: this.newCustomer.latitude, lng: this.newCustomer.longitude }
-      });
+  async submitForm(form) {
+    if (form.valid) {
+      try {
+        // Llamar al servicio para agregar el nuevo cliente
+        this.loading = true
+        const response = await this.clientData.addClient(this.newCustomer);
+        console.log('Respuesta del servidor:', response);
+        this.loading = false
+        if (response && !response.error) {
+          // Agregar el nuevo cliente a la lista localmente si la respuesta es exitosa
+          this.customers.push({
+            ...this.newCustomer,
+            selected: false,
+            coordinates: { lat: this.newCustomer.latitude, lng: this.newCustomer.longitude }
+          });
 
-      // Resetea el formulario después de enviarlo
-      this.newCustomer = {
-        name: '',
-        address: '',
-        phone: '',
-        latitude: null,
-        longitude: null
-      };
+          // Resetea el formulario después de enviarlo
+          this.newCustomer = {
+            name: '',
+            address: '',
+            phone: '',
+            latitude: null,
+            longitude: null
+          };
 
-      // Cambia el segmento a la lista después de agregar
-      this.segment = 'list';
+          // Cambia el segmento a la lista después de agregar
+          this.segment = 'list';
+
+          // Muestra un mensaje de éxito
+          const toast = await this.toastCtrl.create({
+            message: 'Cliente registrado exitosamente',
+            duration: 2000,
+            position: 'top'
+          });
+          toast.present();
+        } else {
+          this.loading = false
+          throw new Error(response.message || 'Error desconocido');
+        }
+      } catch (error) {
+        this.loading = false
+        console.error('Error al registrar cliente:', error);
+        // Muestra un mensaje de error
+        const alert = await this.alertCtrl.create({
+          header: 'Error',
+          message: 'No se pudo registrar el cliente. Inténtelo de nuevo más tarde.',
+          buttons: ['OK']
+        });
+        await alert.present();
+      }
     } else {
-      this.alertCtrl.create({
+      const alert = await this.alertCtrl.create({
         header: 'Error',
-        message: 'Por favor, complete todos los campos.',
+        message: 'Por favor, complete todos los campos correctamente.',
         buttons: ['OK']
-      }).then(alert => alert.present());
+      });
+      await alert.present();
     }
   }
+
 }
