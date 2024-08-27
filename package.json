@@ -34,6 +34,7 @@
     "@capacitor/app": "^4.1.1",
     "@capacitor/core": "4.6.3",
     "@capacitor/device": "4.1.0",
+    "@capacitor/geolocation": "^4.1.0",
     "@capacitor/haptics": "4.1.0",
     "@capacitor/ios": "4.6.3",
     "@capacitor/keyboard": "4.1.1",

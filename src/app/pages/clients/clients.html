@@ -160,6 +160,10 @@
           <div *ngIf="longitude.invalid && longitude.touched" class="error-message">
             La longitud es requerida.
           </div>
+
+          <ion-button expand="block" color="secondary" (click)="getCurrentLocation()" style="margin-bottom: 12px;">
+            Obtener Ubicación Actual
+          </ion-button>
   
           <div class="ion-padding">
             <ion-row>

@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { AlertController, LoadingController, ModalController, ToastController, Config } from '@ionic/angular';
 import { App } from '@capacitor/app';
 import { ClientData } from '../../providers/client-data'; // Ajusta la ruta al servicio
+import { Geolocation } from '@capacitor/geolocation';
 
 @Component({
   selector: 'page-clients',
@@ -240,5 +241,44 @@ export class ClientsPage implements OnInit {
       await alert.present();
     }
   }
+
+  async getCurrentLocation() {
+    try {
+      // Verificar permisos de ubicación
+      const permissions = await Geolocation.checkPermissions();
+      
+      // Solicitar permisos si no están concedidos
+      if (permissions.location !== 'granted') {
+        const result = await Geolocation.requestPermissions();
+        if (result.location !== 'granted') {
+          // Si el permiso sigue sin ser concedido, informar al usuario
+          const alert = await this.alertCtrl.create({
+            header: 'Permiso Denegado',
+            message: 'Para registrar clientes, necesitas permitir el acceso a tu ubicación.',
+            buttons: ['OK']
+          });
+          await alert.present();
+          return; // Salir de la función si no se concedió el permiso
+        }
+      }
+      
+      // Obtener la ubicación actual
+      const coordinates = await Geolocation.getCurrentPosition();
+      this.newCustomer.latitude = coordinates.coords.latitude;
+      this.newCustomer.longitude = coordinates.coords.longitude;
+      
+    } catch (error) {
+      console.error('Error obteniendo ubicación:', error);
+      // Mostrar alerta de error
+      const alert = await this.alertCtrl.create({
+        header: 'Error',
+        message: 'No se pudo obtener la ubicación. Verifica los permisos y vuelve a intentarlo.',
+        buttons: ['OK']
+      });
+      await alert.present();
+    }
+  }
+  
+  
 
 }
