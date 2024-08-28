@@ -36,6 +36,9 @@ export class ClientsPage implements OnInit {
 
   loading = true;
 
+  defaultLatitude = -25.439967325365544;
+  defaultLongitude = -56.42787288104681;
+
   constructor(
     public alertCtrl: AlertController,
     public loadingCtrl: LoadingController,
@@ -108,9 +111,18 @@ export class ClientsPage implements OnInit {
         attribution: '© OpenStreetMap contributors'
       }).addTo(map);
   
-      // Agregar el marcador draggable
+      // Crear un ícono personalizado
+      const customIcon = L.icon({
+        iconUrl: '../../../assets/leaflet/marker-icon-2x.png', // Ruta de tu ícono personalizado
+        iconSize: [28, 48], // Tamaño del ícono
+        iconAnchor: [19, 38], // Punto de anclaje del ícono (centro inferior)
+        popupAnchor: [0, -38]  // Punto donde se ancla el popup (justo encima del ícono)
+      });
+  
+      // Agregar el marcador draggable con el ícono personalizado
       const marker = L.marker([this.newCustomer.latitude, this.newCustomer.longitude], {
-        draggable: true
+        draggable: true,
+        icon: customIcon // Usar el ícono personalizado
       }).addTo(map)
         .bindPopup('Ubicación del cliente')
         .openPopup();
@@ -118,16 +130,16 @@ export class ClientsPage implements OnInit {
       // Actualizar las coordenadas cuando el marcador se mueve
       marker.on('dragend', (event: L.LeafletEvent) => {
         const position = event.target.getLatLng();
-        this.newCustomer.latitude = position.lat;
-        this.newCustomer.longitude = position.lng;
+        this.defaultLatitude = position.lat;
+        this.defaultLongitude = position.lng;
       });
   
       // Permitir seleccionar un nuevo punto con clic
       map.on('click', (event: L.LeafletMouseEvent) => {
         const position = event.latlng;
         marker.setLatLng(position); // Mover el marcador al nuevo punto
-        this.newCustomer.latitude = position.lat;
-        this.newCustomer.longitude = position.lng;
+        this.defaultLatitude = position.lat;
+        this.defaultLongitude = position.lng;
         marker.bindPopup('Nueva ubicación').openPopup(); // Actualizar el popup del marcador
       });
     }, 300); // Delay para asegurar que el modal está completamente renderizado
@@ -339,6 +351,8 @@ export class ClientsPage implements OnInit {
   }
 
   confirm() {
+    this.newCustomer.latitude = this.defaultLatitude;
+    this.newCustomer.longitude = this.defaultLongitude;
     this.modal.dismiss(this.name, 'confirm');
   }
 

@@ -22,23 +22,6 @@ ion-fab-button {
   width: 100%;  /* O un ancho específico */
 }
 
-/* Ruta a los iconos de Leaflet */
-.leaflet-default-icon-path {
-  background-image: url('../../../assets/leaflet/marker-icon.png');
-}
-
-.leaflet-marker-icon {
-  background-image: url('../../../assets/leaflet/marker-icon.png');
-}
-
-.leaflet-marker-icon-2x {
-  background-image: url('../../../assets/leaflet/marker-icon-2x.png');
-}
-
-.leaflet-marker-shadow {
-  background-image: url('../../../assets/leaflet/marker-shadow.png');
-}
-
 $categories: (
   ionic: var(--ion-color-primary),
   angular: #ac282b,
