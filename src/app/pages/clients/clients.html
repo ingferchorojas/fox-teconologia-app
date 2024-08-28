@@ -127,6 +127,7 @@
             El teléfono es requerido.
           </div>
   
+          <!-- Cambiar latitud y longitud para ser solo de lectura -->
           <ion-input
             label="Latitud"
             labelPlacement="stacked"
@@ -135,9 +136,9 @@
             name="latitude"
             type="number"
             #latitude="ngModel"
+            readonly
             spellcheck="false"
             autocapitalize="off"
-            required
             style="margin-bottom: 12px;">
           </ion-input>
           <div *ngIf="latitude.invalid && latitude.touched" class="error-message">
@@ -152,18 +153,14 @@
             name="longitude"
             type="number"
             #longitude="ngModel"
+            readonly
             spellcheck="false"
             autocapitalize="off"
-            required
             style="margin-bottom: 12px;">
           </ion-input>
           <div *ngIf="longitude.invalid && longitude.touched" class="error-message">
             La longitud es requerida.
           </div>
-
-          <ion-button expand="block" color="secondary" (click)="getCurrentLocation()" style="margin-bottom: 12px;">
-            Obtener Ubicación Actual
-          </ion-button>
   
           <div class="ion-padding">
             <ion-row>

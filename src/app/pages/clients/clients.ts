@@ -27,7 +27,7 @@ export class ClientsPage implements OnInit {
     longitude: null
   };
 
-  loading = true
+  loading = true;
 
   constructor(
     public alertCtrl: AlertController,
@@ -37,7 +37,7 @@ export class ClientsPage implements OnInit {
     public toastCtrl: ToastController,
     public config: Config,
     private clientData: ClientData // Inyección del servicio ClientData
-  ) { 
+  ) {
     App.addListener('backButton', async () => {
       // Obtén la ruta actual
       const currentUrl = this.router.url;
@@ -82,6 +82,11 @@ export class ClientsPage implements OnInit {
     this.logCurrentRoute();
 
     this.loadCustomers(); // Cargar los clientes al iniciar
+
+    // Llamar a getCurrentLocation solo si el segmento es 'add'
+    if (this.segment === 'add') {
+      this.getCurrentLocation();
+    }
   }
 
   logCurrentRoute() {
@@ -100,6 +105,9 @@ export class ClientsPage implements OnInit {
         latitude: null,
         longitude: null
       };
+      
+      // Llamar a getCurrentLocation al cargar el formulario para agregar un cliente
+      this.getCurrentLocation();
     }
   }
 
@@ -107,9 +115,9 @@ export class ClientsPage implements OnInit {
     try {
       const data = await this.clientData.getClientData(); // Obtiene los datos desde el servicio
       this.customers = data; // Asigna los datos a la lista de clientes
-      this.loading = false
+      this.loading = false;
     } catch (error) {
-      this.loading = false
+      this.loading = false;
       console.error('Error loading customers:', error);
       this.alertCtrl.create({
         header: 'Error',
@@ -186,10 +194,10 @@ export class ClientsPage implements OnInit {
     if (form.valid) {
       try {
         // Llamar al servicio para agregar el nuevo cliente
-        this.loading = true
+        this.loading = true;
         const response = await this.clientData.addClient(this.newCustomer);
         console.log('Respuesta del servidor:', response);
-        this.loading = false
+        this.loading = false;
         if (response && !response.error) {
           // Agregar el nuevo cliente a la lista localmente si la respuesta es exitosa
           this.customers.push({
@@ -218,11 +226,11 @@ export class ClientsPage implements OnInit {
           });
           toast.present();
         } else {
-          this.loading = false
+          this.loading = false;
           throw new Error(response.message || 'Error desconocido');
         }
       } catch (error) {
-        this.loading = false
+        this.loading = false;
         console.error('Error al registrar cliente:', error);
         // Muestra un mensaje de error
         const alert = await this.alertCtrl.create({
@@ -263,11 +271,14 @@ export class ClientsPage implements OnInit {
       }
       
       // Obtener la ubicación actual
+      this.loading = true;
       const coordinates = await Geolocation.getCurrentPosition();
       this.newCustomer.latitude = coordinates.coords.latitude;
       this.newCustomer.longitude = coordinates.coords.longitude;
+      this.loading = false;
       
     } catch (error) {
+      this.loading = false;
       console.error('Error obteniendo ubicación:', error);
       // Mostrar alerta de error
       const alert = await this.alertCtrl.create({
@@ -278,7 +289,4 @@ export class ClientsPage implements OnInit {
       await alert.present();
     }
   }
-  
-  
-
 }

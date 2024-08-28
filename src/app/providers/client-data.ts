@@ -34,6 +34,9 @@ export class ClientData {
 
   async addClient(client: { name: string, address: string, phone: string, latitude: number, longitude: number }): Promise<any> {
     try {
+      client.name = client.name.trim();
+      client.address = client.address.trim();
+      client.phone = client.phone.trim();
       const token = await this.userData.getToken(); // Obtiene el token del servicio UserData
       const headers = new HttpHeaders({
         'Content-Type': 'application/json',
