@@ -48,11 +48,11 @@
         fill="solid"
         [(ngModel)]="signup.phone"
         name="phone"
-        type="text"
+        type="tel"
         #phone="ngModel"
         pattern="^0971[0-9]{6}$"
-        errorText="El teléfono debe tener el formato 0971422641"
-        placeholder="0971422641"
+        errorText="El teléfono debe tener el formato 0971444555"
+        placeholder="Ejemplo: 0971444555"
         required>
       </ion-input>
 
@@ -66,6 +66,7 @@
         #username="ngModel"
         pattern="[a-zA-Z0-9]+"
         errorText="El usuario debe ser alfanumérico y no debe contener espacios"
+        placeholder="Ejemplo: movil1"
         required>
       </ion-input>
 
@@ -78,6 +79,18 @@
         type="password"
         #password="ngModel"
         errorText="La contraseña es requerida"
+        required>
+      </ion-input>
+
+      <ion-input
+        label="Repetir Contraseña"
+        labelPlacement="stacked"
+        fill="solid"
+        [(ngModel)]="signup.confirm_password"
+        name="confirm_password"
+        type="password"
+        #confirmPassword="ngModel"
+        errorText="Las contraseñas no coinciden"
         required>
       </ion-input>
 
