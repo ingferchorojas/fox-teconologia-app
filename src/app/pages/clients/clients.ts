@@ -5,6 +5,7 @@ import { App } from '@capacitor/app';
 import { ClientData } from '../../providers/client-data'; // Ajusta la ruta al servicio
 import { Geolocation } from '@capacitor/geolocation';
 import { OverlayEventDetail } from '@ionic/core/components';
+import * as L from 'leaflet';
 
 @Component({
   selector: 'page-clients',
@@ -97,7 +98,40 @@ export class ClientsPage implements OnInit {
 
   async openModal() {
     await this.modal.present();
-  }
+  
+    // Configurar el mapa en el modal
+    setTimeout(() => {
+      const map = L.map('map').setView([this.newCustomer.latitude, this.newCustomer.longitude], 13);
+  
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
+  
+      // Agregar el marcador draggable
+      const marker = L.marker([this.newCustomer.latitude, this.newCustomer.longitude], {
+        draggable: true
+      }).addTo(map)
+        .bindPopup('Ubicación del cliente')
+        .openPopup();
+  
+      // Actualizar las coordenadas cuando el marcador se mueve
+      marker.on('dragend', (event: L.LeafletEvent) => {
+        const position = event.target.getLatLng();
+        this.newCustomer.latitude = position.lat;
+        this.newCustomer.longitude = position.lng;
+      });
+  
+      // Permitir seleccionar un nuevo punto con clic
+      map.on('click', (event: L.LeafletMouseEvent) => {
+        const position = event.latlng;
+        marker.setLatLng(position); // Mover el marcador al nuevo punto
+        this.newCustomer.latitude = position.lat;
+        this.newCustomer.longitude = position.lng;
+        marker.bindPopup('Nueva ubicación').openPopup(); // Actualizar el popup del marcador
+      });
+    }, 300); // Delay para asegurar que el modal está completamente renderizado
+  }  
 
   logCurrentRoute() {
     console.log('Current route:', this.router.url);
@@ -125,6 +159,7 @@ export class ClientsPage implements OnInit {
     try {
       const data = await this.clientData.getClientData(); // Obtiene los datos desde el servicio
       this.customers = data; // Asigna los datos a la lista de clientes
+      console.log("customers", this.customers)
       this.loading = false;
     } catch (error) {
       this.loading = false;
@@ -312,5 +347,20 @@ export class ClientsPage implements OnInit {
     if (ev.detail.role === 'confirm') {
       this.message = `Hello, ${ev.detail.data}!`;
     }
+  }
+
+  callPhone(phone: string) {
+    const dialerUrl = `tel:${phone}`;
+    window.open(dialerUrl, '_system');
+  }
+  
+  editCustomer(customer: any) {
+    // Aquí puedes implementar la lógica para editar el cliente
+    console.log(`Editando cliente: ${customer.name}`);
+  }
+  
+  deleteCustomer(customer: any) {
+    // Aquí puedes implementar la lógica para borrar el cliente
+    console.log(`Borrando cliente: ${customer.name}`);
   }
 }
