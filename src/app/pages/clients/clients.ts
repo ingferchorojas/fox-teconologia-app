@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { AlertController, LoadingController, ModalController, ToastController, Config } from '@ionic/angular';
+import { AlertController, LoadingController, ModalController, ToastController, Config, IonModal } from '@ionic/angular';
 import { App } from '@capacitor/app';
 import { ClientData } from '../../providers/client-data'; // Ajusta la ruta al servicio
 import { Geolocation } from '@capacitor/geolocation';
+import { OverlayEventDetail } from '@ionic/core/components';
 
 @Component({
   selector: 'page-clients',
@@ -11,6 +12,11 @@ import { Geolocation } from '@capacitor/geolocation';
   styleUrls: ['./clients.scss'],
 })
 export class ClientsPage implements OnInit {
+  @ViewChild('modalTrigger') modal: IonModal;
+
+  message = 'This modal example uses triggers to automatically open a modal when the button is clicked.';
+  name: string;
+
   ios: boolean;
   queryText = '';
   segment = 'list'; // Default segment
@@ -87,6 +93,10 @@ export class ClientsPage implements OnInit {
     if (this.segment === 'add') {
       this.getCurrentLocation();
     }
+  }
+
+  async openModal() {
+    await this.modal.present();
   }
 
   logCurrentRoute() {
@@ -287,6 +297,20 @@ export class ClientsPage implements OnInit {
         buttons: ['OK']
       });
       await alert.present();
+    }
+  }
+  cancel() {
+    this.modal.dismiss(null, 'cancel');
+  }
+
+  confirm() {
+    this.modal.dismiss(this.name, 'confirm');
+  }
+
+  onWillDismiss(event: Event) {
+    const ev = event as CustomEvent<OverlayEventDetail<string>>;
+    if (ev.detail.role === 'confirm') {
+      this.message = `Hello, ${ev.detail.data}!`;
     }
   }
 }

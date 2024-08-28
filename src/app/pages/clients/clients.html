@@ -127,7 +127,6 @@
             El teléfono es requerido.
           </div>
   
-          <!-- Cambiar latitud y longitud para ser solo de lectura -->
           <ion-input
             label="Latitud"
             labelPlacement="stacked"
@@ -165,6 +164,13 @@
           <div class="ion-padding">
             <ion-row>
               <ion-col>
+                <ion-button id="open-modal" expand="block" color="secondary" (click)="openModal()">
+                  Ubicar en el mapa
+                </ion-button>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col>
                 <ion-button type="submit" expand="block" [disabled]="addClientForm.invalid">
                   Registrar cliente
                 </ion-button>
@@ -176,4 +182,22 @@
     </ion-card>
   </div>
 
+  <!-- Modal -->
+  <ion-modal #modalTrigger>
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-buttons slot="start">
+            <ion-button (click)="cancel()">Cancelar</ion-button>
+          </ion-buttons>
+          <ion-title></ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="confirm()" [strong]="true">Confirmar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>
