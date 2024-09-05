@@ -4,6 +4,7 @@ import { AlertController, IonList, IonRouterOutlet, LoadingController, ModalCont
 
 import { ConferenceData } from '../../providers/conference-data';
 import { UserData } from '../../providers/user-data';
+import { ProductData } from '../../providers/product-data'; // Importar el servicio ProductData
 import { App } from '@capacitor/app';
 
 @Component({
@@ -12,7 +13,6 @@ import { App } from '@capacitor/app';
   styleUrls: ['./products.scss'],
 })
 export class ProductsPage implements OnInit {
-  // Gets a reference to the list element
   @ViewChild('scheduleList', { static: true }) scheduleList: IonList;
 
   ios: boolean;
@@ -25,11 +25,11 @@ export class ProductsPage implements OnInit {
   confDate: string;
   showSearchbar: boolean;
 
-  products = [
-    { name: 'Producto A', stock: 10, added: 0, price: 100 },
-    { name: 'Producto B', stock: 5, added: 0, price: 200 },
-    { name: 'Producto C', stock: 20, added: 0, price: 300 }
-  ];  
+  speakers: any[] = [];
+
+  loading = false;
+
+  products = []; // Aquí se guardarán los productos obtenidos del endpoint
 
   constructor(
     public alertCtrl: AlertController,
@@ -40,7 +40,8 @@ export class ProductsPage implements OnInit {
     public routerOutlet: IonRouterOutlet,
     public toastCtrl: ToastController,
     public user: UserData,
-    public config: Config
+    public config: Config,
+    private productData: ProductData // Inyectar ProductData en el constructor
   ) { 
     App.addListener('backButton', data => {
       if (data.canGoBack) {
@@ -48,17 +49,32 @@ export class ProductsPage implements OnInit {
       } else {
         App.minimizeApp();
       }
-    })
+    });
   }
 
   ngOnInit() {
     this.updateSchedule();
 
     this.ios = this.config.get('mode') === 'ios';
+
+    // Llamar a la función para obtener los productos
+    this.loadProducts();
+  }
+
+  // Función para cargar los productos
+  async loadProducts() {
+    try {
+      this.loading = true;
+      this.products = await this.productData.getClientData(); // Obtener productos del servicio y asignarlos a la variable
+      this.loading = false;
+      console.log('Productos cargados:', this.products);
+    } catch (error) {
+      this.loading = false;
+      console.error('Error al cargar productos:', error);
+    }
   }
 
   selectCustomer() {
-    // Aquí puedes manejar la acción cuando se hace clic en el botón "Seleccionar cliente"
     console.log('Cliente seleccionado');
   }
 
@@ -74,10 +90,9 @@ export class ProductsPage implements OnInit {
       product.added--;
       product.stock++;
     }
-  }  
+  }
 
   updateSchedule() {
-    // Close any open sliding items when the schedule updates
     if (this.scheduleList) {
       this.scheduleList.closeSlidingItems();
     }
@@ -88,34 +103,23 @@ export class ProductsPage implements OnInit {
     });
   }
 
-  async presentFilter() {
-  }
+  async presentFilter() {}
 
   async addFavorite(slidingItem: HTMLIonItemSlidingElement, sessionData: any) {
     if (this.user.hasFavorite(sessionData.name)) {
-      // Prompt to remove favorite
       this.removeFavorite(slidingItem, sessionData, 'Favorite already added');
     } else {
-      // Add as a favorite
       this.user.addFavorite(sessionData.name);
-
-      // Close the open item
       slidingItem.close();
 
-      // Create a toast
       const toast = await this.toastCtrl.create({
         header: `${sessionData.name} was successfully added as a favorite.`,
         duration: 3000,
-        buttons: [{
-          text: 'Close',
-          role: 'cancel'
-        }]
+        buttons: [{ text: 'Close', role: 'cancel' }]
       });
 
-      // Present the toast at the bottom of the page
       await toast.present();
     }
-
   }
 
   async removeFavorite(slidingItem: HTMLIonItemSlidingElement, sessionData: any, title: string) {
@@ -125,26 +129,19 @@ export class ProductsPage implements OnInit {
       buttons: [
         {
           text: 'Cancel',
-          handler: () => {
-            // they clicked the cancel button, do not remove the session
-            // close the sliding item and hide the option buttons
-            slidingItem.close();
-          }
+          handler: () => slidingItem.close(),
         },
         {
           text: 'Remove',
           handler: () => {
-            // they want to remove this session from their favorites
             this.user.removeFavorite(sessionData.name);
             this.updateSchedule();
-
-            // close the sliding item and hide the option buttons
             slidingItem.close();
           }
         }
       ]
     });
-    // now present the alert on top of all other content
+
     await alert.present();
   }
 

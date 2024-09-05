@@ -1,10 +1,11 @@
 <ion-header translucent="true">
   <ion-toolbar>
+    <ion-progress-bar *ngIf="loading" type="indeterminate"></ion-progress-bar>
     <ion-buttons *ngIf="!showSearchbar" slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
     <ion-title *ngIf="!ios && !showSearchbar">Productos</ion-title>
-    <ion-searchbar *ngIf="showSearchbar" showCancelButton="always" [(ngModel)]="queryText" (ionInput)="updateSchedule()" (ionCancel)="showSearchbar = false" placeholder="Search"></ion-searchbar>
+    <ion-searchbar *ngIf="showSearchbar" showCancelButton="always" [(ngModel)]="queryText" (ionInput)="updateSchedule()" (ionCancel)="showSearchbar = false" placeholder="Buscar"></ion-searchbar>
     <ion-buttons slot="end">
       <ion-button *ngIf="!ios && !showSearchbar" (click)="showSearchbar = true">
         <ion-icon slot="icon-only" name="search"></ion-icon>
@@ -19,8 +20,43 @@
       <ion-title size="large">Productos</ion-title>
     </ion-toolbar>
     <ion-toolbar>
-      <ion-searchbar [(ngModel)]="queryText" (ionInput)="updateSchedule()" placeholder="Search"></ion-searchbar>
+      <ion-searchbar [(ngModel)]="queryText" (ionInput)="updateSchedule()" placeholder="Buscar"></ion-searchbar>
     </ion-toolbar>
   </ion-header>
 
+  <ion-grid fixed>
+    <ion-row>
+      <ion-col size="12" size-md="6" *ngFor="let product of products">
+        <ion-card class="product-card">
+          <ion-card-header>
+            <ion-item detail="false" lines="none" class="product-item" routerLink="/app/tabs/products/product-details/{{product._id}}">
+              <ion-avatar slot="start">
+                <img src="../../../assets/img/package.png" [alt]="product.name + ' imagen del producto'">
+              </ion-avatar>
+              <ion-label>
+                <h2>{{product.name}}</h2>
+                <p>{{ product.price | number:'1.0-0' }} Gs.</p>
+              </ion-label>
+            </ion-item>
+          </ion-card-header>
+
+          <ion-card-content>
+            <ion-list lines="none">
+              <ion-item detail="false" routerLink="/app/tabs/products/product-details/{{product._id}}">
+                <ion-label>
+                  <h3>Stock disponible: {{product.stock}}</h3>
+                </ion-label>
+              </ion-item>
+
+              <ion-item detail="false" routerLink="/app/tabs/products/product-details/{{product._id}}">
+                <ion-label>
+                  <h3>Ver detalles del producto</h3>
+                </ion-label>
+              </ion-item>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>
