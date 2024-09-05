@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController, LoadingController, ModalController, ToastController, Config, IonModal } from '@ionic/angular';
 import { App } from '@capacitor/app';
-import { ClientData } from '../../providers/client-data'; // Ajusta la ruta al servicio
+import { ClientData } from '../../providers/client-data';
 import { Geolocation } from '@capacitor/geolocation';
 import { OverlayEventDetail } from '@ionic/core/components';
 import * as L from 'leaflet';
@@ -373,8 +373,50 @@ export class ClientsPage implements OnInit {
     console.log(`Editando cliente: ${customer.name}`);
   }
   
-  deleteCustomer(customer: any) {
-    // Aquí puedes implementar la lógica para borrar el cliente
-    console.log(`Borrando cliente: ${customer.name}`);
+  async deleteCustomer(customer: any) {
+    const alert = await this.alertCtrl.create({
+      header: 'Confirmación',
+      message: `¿Estás seguro de que quieres eliminar al cliente ${customer.name}?`,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Eliminar',
+          handler: async () => {
+            try {
+              await this.loadingCtrl.create({
+                message: 'Eliminando cliente...',
+              }).then(loading => loading.present());
+
+              await this.clientData.deleteClient(customer._id); // Llama al método de eliminación
+
+              // Eliminar el cliente de la lista localmente
+              this.customers = this.customers.filter(c => c._id !== customer._id);
+
+              const toast = await this.toastCtrl.create({
+                message: 'Cliente eliminado exitosamente',
+                duration: 2000,
+                position: 'top'
+              });
+              toast.present();
+            } catch (error) {
+              console.error('Error al eliminar cliente:', error);
+              const alert = await this.alertCtrl.create({
+                header: 'Error',
+                message: 'No se pudo eliminar al cliente. Inténtelo de nuevo más tarde.',
+                buttons: ['OK']
+              });
+              await alert.present();
+            } finally {
+              this.loadingCtrl.dismiss();
+            }
+          }
+        }
+      ]
+    });
+
+    await alert.present();
   }
 }

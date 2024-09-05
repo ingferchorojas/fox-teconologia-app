@@ -1,13 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { UserData } from './user-data'; // Ajusta la ruta según la ubicación del servicio
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ClientData {
   private apiUrlClient = 'http://100.26.210.128:3000/api/client';
+  private apiUrlDeleteClient = 'http://100.26.210.128:3000/api/client';
 
   constructor(private http: HttpClient, private userData: UserData) { }
 
@@ -19,7 +21,7 @@ export class ClientData {
       });
 
       const response: any = await firstValueFrom(this.http.get(this.apiUrlClient, { headers }));
-      console.log(response)
+      console.log(response);
       if (response && !response.error) {
         return response.data; // Devuelve solo el campo "data"
       } else {
@@ -48,6 +50,33 @@ export class ClientData {
       return response; // Devuelve la respuesta completa
     } catch (error) {
       console.error('Error adding client:', error);
+      throw error; // Lanza el error para que pueda ser manejado por el llamador
+    }
+  }
+
+  async deleteClient(clientId: string): Promise<any> {
+    try {
+      const token = await this.userData.getToken(); // Obtiene el token del servicio UserData
+      if (!token) {
+        throw new Error('User is not authenticated.');
+      }
+
+      const headers = new HttpHeaders({
+        'authorization': `Bearer ${token}`
+      });
+
+      const url = `${this.apiUrlDeleteClient}/${clientId}`;
+
+      const response: any = await firstValueFrom(this.http.delete<any>(url, { headers })
+        .pipe(
+          catchError(error => {
+            return throwError(() => new Error(error.error.message ?? 'Failed to delete client.'));
+          })
+        ));
+      console.log('Cliente eliminado:', response);
+      return response; // Devuelve la respuesta completa
+    } catch (error) {
+      console.error('Error deleting client:', error);
       throw error; // Lanza el error para que pueda ser manejado por el llamador
     }
   }
