@@ -22,6 +22,7 @@ export class AppComponent implements OnInit {
     { title: 'Clientes', url: '/app/tabs/clients', icon: 'people' },
     { title: 'Productos', url: '/app/tabs/products', icon: 'storefront' },
     { title: 'Venta', url: '/app/tabs/cart', icon: 'cart' },
+    { title: 'Historial', url: '/app/tabs/history', icon: 'ticket' },
     { title: 'Información', url: '/app/tabs/about', icon: 'information-circle' }
   ];
   

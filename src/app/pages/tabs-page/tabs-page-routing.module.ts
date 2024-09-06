@@ -64,6 +64,16 @@ const routes: Routes = [
         ]
       },
       {
+        path: 'history',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../history/history.module').then(m => m.HistoryModule),
+            canActivate: [AuthGuard]
+          }
+        ]
+      },
+      {
         path: '',
         redirectTo: '/app/tabs/clients',
         pathMatch: 'full'
