@@ -9,6 +9,10 @@
 </ion-header>
 
 <ion-content class="content">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
   <ion-list>
     <ion-item *ngFor="let item of items">
       <ion-thumbnail slot="start">
@@ -16,8 +20,17 @@
       </ion-thumbnail>
       <ion-label>
         <h2>{{ item.nombreCliente }}</h2>
-        <p>{{ item.total | currency:'Gs':'symbol':'1.0-0' }}</p>
+        <p>{{ item.total | currency:'Gs ':'symbol':'1.0-0' }}</p>
+        <p>{{ item.fecha }}</p>
       </ion-label>
+      
+      <!-- Botón más grande con ícono de lupa -->
+      <ion-button fill="clear" slot="end" style="font-size: 24px;">
+        <ion-icon name="search-outline" style="font-size: 32px;"></ion-icon>
+      </ion-button>
+      
     </ion-item>
   </ion-list>
 </ion-content>
+
+

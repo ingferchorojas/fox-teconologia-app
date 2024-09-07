@@ -61,6 +61,11 @@ export class ProductsPage implements OnInit {
     this.loadProducts();
   }
 
+  async handleRefresh(event: Event) {
+    await this.loadProducts();
+    (event as CustomEvent).detail.complete(); // Completa el refresco
+  }
+
   // Función para cargar los productos
   async loadProducts() {
     try {

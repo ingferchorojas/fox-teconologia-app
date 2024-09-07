@@ -42,13 +42,20 @@ export class HistoryPage implements OnInit {
     this.loadOrders(); // Cargar las órdenes al iniciar el componente
   }
 
+  async handleRefresh(event: Event) {
+    await this.loadOrders();
+    (event as CustomEvent).detail.complete(); // Completa el refresco
+  }
+
   async loadOrders() {
     try {
       this.loading = true;
       const orders = await this.orderData.getOrderData(); // Llama al servicio para obtener las órdenes
+      console.log("orders", orders)
       this.items = orders.map(order => ({
         nombreCliente: order.client_id.name, // Nombre del cliente
-        total: order.items.reduce((sum, item) => sum + (item.price * item.qty), 0) // Sumar precio * cantidad
+        total: order.items.reduce((sum, item) => sum + (item.price * item.qty), 0), // Sumar precio * cantidad
+        fecha: order.createdAt
       }));
       this.loading = false; 
     } catch (error) {
