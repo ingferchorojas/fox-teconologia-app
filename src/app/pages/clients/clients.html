@@ -4,7 +4,7 @@
     <ion-buttons slot="start">
       <ion-menu-button *ngIf="!showSearchbar"></ion-menu-button>
     </ion-buttons>
-    <ion-title>{{ segment === 'list' ? 'Clientes' : 'Agregar Cliente' }}</ion-title>
+    <ion-title>{{ segment === 'list' ? 'Clientes' : segmentHeader }}</ion-title>
     <ion-searchbar *ngIf="showSearchbar && segment === 'list'" showCancelButton="always" [(ngModel)]="queryText" (ionInput)="updateView()" (ionCancel)="showSearchbar = false" placeholder="Search"></ion-searchbar>
     <ion-buttons slot="end">
       <ion-button *ngIf="segment === 'list' && !showSearchbar" (click)="showSearchbar = true">
@@ -23,7 +23,7 @@
       Lista de Clientes
     </ion-segment-button>
     <ion-segment-button value="add">
-      Agregar Cliente
+      {{ segmentHeader }}
     </ion-segment-button>
   </ion-segment>
 
@@ -184,7 +184,7 @@
             <ion-row>
               <ion-col>
                 <ion-button type="submit" expand="block" [disabled]="addClientForm.invalid">
-                  Registrar cliente
+                  {{ segmentHeader }}
                 </ion-button>
               </ion-col>
             </ion-row>

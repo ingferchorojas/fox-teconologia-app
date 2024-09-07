@@ -80,4 +80,26 @@ export class ClientData {
       throw error; // Lanza el error para que pueda ser manejado por el llamador
     }
   }
+
+  async updateClient(client: { _id: string, name: string, address: string, phone: string, latitude: number, longitude: number }): Promise<any> {
+    try {
+      client.name = client.name.trim();
+      client.address = client.address.trim();
+      client.phone = client.phone.trim();
+      const token = await this.userData.getToken(); // Obtiene el token del servicio UserData
+      const headers = new HttpHeaders({
+        'Content-Type': 'application/json',
+        'authorization': `Bearer ${token}`
+      });
+
+      const url = `${this.apiUrlClient}/${client._id}`;
+
+      const response: any = await firstValueFrom(this.http.put(url, client, { headers }));
+      console.log('Cliente actualizado:', response);
+      return response; // Devuelve la respuesta completa
+    } catch (error) {
+      console.error('Error updating client:', error);
+      throw error; // Lanza el error para que pueda ser manejado por el llamador
+    }
+  }
 }

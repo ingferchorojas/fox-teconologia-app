@@ -27,6 +27,7 @@ export class ClientsPage implements OnInit {
 
   // Datos para el nuevo cliente
   newCustomer = {
+    _id: '',
     name: '',
     address: '',
     phone: '',
@@ -38,6 +39,10 @@ export class ClientsPage implements OnInit {
 
   defaultLatitude = -25.439967325365544;
   defaultLongitude = -56.42787288104681;
+
+  // Editar
+  segmentHeader = 'Agregar cliente';
+  editClient = false;
 
   constructor(
     public alertCtrl: AlertController,
@@ -149,12 +154,22 @@ export class ClientsPage implements OnInit {
     console.log('Current route:', this.router.url);
   }
 
-  updateView() {
+  async updateView() {
     if (this.segment === 'list') {
-      // Update view for the list of customers if necessary
+      this.segmentHeader = 'Agregar cliente';
+      this.editClient = false;
+      this.newCustomer = {
+        _id: '',
+        name: '',
+        address: '',
+        phone: '',
+        latitude: null,
+        longitude: null
+      };
     } else if (this.segment === 'add') {
       // Reset form for adding new customers
       this.newCustomer = {
+        _id: '',
         name: '',
         address: '',
         phone: '',
@@ -249,22 +264,27 @@ export class ClientsPage implements OnInit {
   // Manejar el envío del formulario
   async submitForm(form) {
     if (form.valid) {
+      let errorMessage: string;
       try {
         // Llamar al servicio para agregar el nuevo cliente
         this.loading = true;
-        const response = await this.clientData.addClient(this.newCustomer);
+        let response: any;
+        let message: string;
+        if (this.editClient) {
+          response = await this.clientData.updateClient(this.newCustomer);
+          message = 'Cliente modificado exitosamente';
+          errorMessage = 'Error al modificar cliente';
+        } else {
+          response = await this.clientData.addClient(this.newCustomer);
+          message = 'Cliente registrado exitosamente';
+          errorMessage = 'Error al modificar cliente';
+        }
         console.log('Respuesta del servidor:', response);
         this.loading = false;
         if (response && !response.error) {
-          // Agregar el nuevo cliente a la lista localmente si la respuesta es exitosa
-          this.customers.push({
-            ...this.newCustomer,
-            selected: false,
-            coordinates: { lat: this.newCustomer.latitude, lng: this.newCustomer.longitude }
-          });
-
           // Resetea el formulario después de enviarlo
           this.newCustomer = {
+            _id: '',
             name: '',
             address: '',
             phone: '',
@@ -274,10 +294,10 @@ export class ClientsPage implements OnInit {
 
           // Cambia el segmento a la lista después de agregar
           this.segment = 'list';
-
+          window.location.reload();
           // Muestra un mensaje de éxito
           const toast = await this.toastCtrl.create({
-            message: 'Cliente registrado exitosamente',
+            message,
             duration: 2000,
             position: 'top'
           });
@@ -292,7 +312,7 @@ export class ClientsPage implements OnInit {
         // Muestra un mensaje de error
         const alert = await this.alertCtrl.create({
           header: 'Error',
-          message: 'No se pudo registrar el cliente. Inténtelo de nuevo más tarde.',
+          message: errorMessage,
           buttons: ['OK']
         });
         await alert.present();
@@ -369,8 +389,18 @@ export class ClientsPage implements OnInit {
   }
   
   editCustomer(customer: any) {
-    // Aquí puedes implementar la lógica para editar el cliente
-    console.log(`Editando cliente: ${customer.name}`);
+    console.log("ver", customer)
+    this.segment = 'add';
+    this.segmentHeader = 'Editar cliente';
+    this.editClient = true;
+    this.newCustomer = {
+      _id: customer._id,
+      address: customer.address,
+      latitude: customer.latitude,
+      longitude: customer.longitude,
+      name: customer.name,
+      phone: customer.phone
+    };
   }
   
   async deleteCustomer(customer: any) {
