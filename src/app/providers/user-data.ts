@@ -11,9 +11,10 @@ export class UserData {
   favorites: string[] = [];
   HAS_LOGGED_IN = 'hasLoggedIn';
   HAS_SEEN_TUTORIAL = 'hasSeenTutorial';
-  private apiUrlLogin = 'http://100.26.210.128:3000/api/auth/login';
-  private apiUrlSignup = 'http://100.26.210.128:3000/api/auth/signup';
-  private apitUrlChangePassword = 'http://100.26.210.128:3000/api/user/change-password';
+  private host = 'http://149.28.106.111:3000'
+  private apiUrlLogin = `${this.host}/login`;
+  private apiUrlSignup = `${this.host}/users`;
+  private apitUrlChangePassword = `${this.host}/change-password`;
 
   constructor(
     public storage: Storage,
@@ -60,7 +61,7 @@ export class UserData {
 
   signup(username: string, password: string, first_name: string, last_name: string, phone: string): Promise<any> {
     const signupData = { username: username.trim(), password, first_name: first_name.trim(), last_name: last_name.trim(), phone: phone.trim() };
-
+    console.log(signupData)
     return firstValueFrom(this.http.post<any>(this.apiUrlSignup, signupData, {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' })
     }).pipe(

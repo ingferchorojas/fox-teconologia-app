@@ -32,7 +32,9 @@ export class ClientsPage implements OnInit {
     address: '',
     phone: '',
     latitude: null,
-    longitude: null
+    longitude: null,
+    ruc_id: '',
+    ruc_reason: ''
   };
 
   loading = true;
@@ -164,7 +166,9 @@ export class ClientsPage implements OnInit {
         address: '',
         phone: '',
         latitude: null,
-        longitude: null
+        longitude: null,
+        ruc_id: '',
+        ruc_reason: ''
       };
     } else if (this.segment === 'add') {
       // Reset form for adding new customers
@@ -174,7 +178,9 @@ export class ClientsPage implements OnInit {
         address: '',
         phone: '',
         latitude: null,
-        longitude: null
+        longitude: null,
+        ruc_id: '',
+        ruc_reason: ''
       };
       
       // Llamar a getCurrentLocation al cargar el formulario para agregar un cliente
@@ -289,7 +295,9 @@ export class ClientsPage implements OnInit {
             address: '',
             phone: '',
             latitude: null,
-            longitude: null
+            longitude: null,
+            ruc_id: '',
+            ruc_reason: ''
           };
 
           // Cambia el segmento a la lista después de agregar
@@ -399,7 +407,9 @@ export class ClientsPage implements OnInit {
       latitude: customer.latitude,
       longitude: customer.longitude,
       name: customer.name,
-      phone: customer.phone
+      phone: customer.phone,
+      ruc_id: customer.ruc_id,
+      ruc_reason: customer.ruc_reason
     };
   }
   

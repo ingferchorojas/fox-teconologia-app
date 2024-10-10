@@ -44,13 +44,15 @@
           <ion-label>
             <h2>{{ customer.name }}</h2>
             <p>{{ customer.phone }}</p>
-            <p>{{ customer.address }}</p> <!-- Agregado para mostrar la dirección -->
+            <p>{{ customer.address }}</p>
+            <p>Razón social: {{ customer.ruc_reason }}</p>
+            <p>RUC: {{ customer.ruc_id }}</p>
           </ion-label>
           <ion-button fill="clear" (click)="callPhone(customer.phone)">
-            <ion-icon name="call" size="large"></ion-icon> <!-- Icono de teléfono -->
+            <ion-icon name="call" size="large"></ion-icon>
           </ion-button>
         </ion-item>
-    
+      
         <ion-card-content>
           <ion-grid>
             <ion-row>
@@ -62,20 +64,27 @@
               </ion-col>
               <ion-col size="4">
                 <ion-button expand="block" color="primary" fill="outline" (click)="editCustomer(customer)">
-                  <ion-icon slot="start" name="create-outline"></ion-icon> <!-- Icono de editar -->
+                  <ion-icon slot="start" name="create-outline"></ion-icon>
                   Editar
                 </ion-button>
               </ion-col>
               <ion-col size="4">
                 <ion-button expand="block" color="danger" fill="outline" (click)="deleteCustomer(customer)">
-                  <ion-icon slot="start" name="trash-outline"></ion-icon> <!-- Icono de borrar -->
+                  <ion-icon slot="start" name="trash-outline"></ion-icon>
                   Borrar
                 </ion-button>
               </ion-col>
             </ion-row>
           </ion-grid>
         </ion-card-content>
+      
+        <ion-footer>
+          <ion-button expand="block" color="secondary" (click)="selectCustomer(customer)">
+            Seleccionar cliente
+          </ion-button>
+        </ion-footer>
       </ion-card>
+      
     </ion-list>
     
     <ion-list-header [hidden]="customers.length > 0">
@@ -137,6 +146,40 @@
           </ion-input>
           <div *ngIf="phone.invalid && phone.touched" class="error-message">
             El teléfono es requerido.
+          </div>
+
+          <ion-input
+            label="RUC"
+            labelPlacement="stacked"
+            fill="solid"
+            [(ngModel)]="newCustomer.ruc_id"
+            name="ruc_id"
+            type="text"
+            #ruc_id="ngModel"
+            spellcheck="false"
+            autocapitalize="off"
+            required
+            style="margin-bottom: 12px;">
+          </ion-input>
+          <div *ngIf="ruc_id.invalid && ruc_id.touched" class="error-message">
+            El ruc es requerido.
+          </div>
+
+          <ion-input
+            label="Razón social"
+            labelPlacement="stacked"
+            fill="solid"
+            [(ngModel)]="newCustomer.ruc_reason"
+            name="ruc_reason"
+            type="text"
+            #ruc_reason="ngModel"
+            spellcheck="false"
+            autocapitalize="off"
+            required
+            style="margin-bottom: 12px;">
+          </ion-input>
+          <div *ngIf="ruc_reason.invalid && ruc_reason.touched" class="error-message">
+            La razón social es requerida.
           </div>
   
           <ion-input

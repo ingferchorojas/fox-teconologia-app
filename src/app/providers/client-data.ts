@@ -8,8 +8,9 @@ import { catchError } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class ClientData {
-  private apiUrlClient = 'http://100.26.210.128:3000/api/client';
-  private apiUrlDeleteClient = 'http://100.26.210.128:3000/api/client';
+  private host = 'http://149.28.106.111:3000'
+  private apiUrlClient = `${this.host}/clients`;
+  private apiUrlDeleteClient = `${this.host}/clients`;
 
   constructor(private http: HttpClient, private userData: UserData) { }
 
@@ -34,7 +35,7 @@ export class ClientData {
     }
   }
 
-  async addClient(client: { name: string, address: string, phone: string, latitude: number, longitude: number }): Promise<any> {
+  async addClient(client: { name: string, address: string, phone: string, latitude: number, longitude: number, ruc_id: string, ruc_reason: string }): Promise<any> {
     try {
       client.name = client.name.trim();
       client.address = client.address.trim();
@@ -81,7 +82,7 @@ export class ClientData {
     }
   }
 
-  async updateClient(client: { _id: string, name: string, address: string, phone: string, latitude: number, longitude: number }): Promise<any> {
+  async updateClient(client: { _id: string, name: string, address: string, phone: string, latitude: number, longitude: number, ruc_id: string, ruc_reason: string }): Promise<any> {
     try {
       client.name = client.name.trim();
       client.address = client.address.trim();
