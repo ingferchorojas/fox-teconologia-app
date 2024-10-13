@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController, LoadingController, ToastController, Config } from '@ionic/angular';
 import { App } from '@capacitor/app';
+import { CartService } from '../../providers/cart';
 
 @Component({
   selector: 'page-cart',
@@ -14,14 +15,18 @@ export class CartPage implements OnInit {
   showSearchbar: boolean;
 
   productosSeleccionados: any[] = [];
-  clienteSeleccionado: any = null;
+  clienteSeleccionado: any = {
+    nombre: null,
+    ruc_id: null
+  };
 
   constructor(
     public alertCtrl: AlertController,
     public loadingCtrl: LoadingController,
     public toastCtrl: ToastController,
     public router: Router,
-    public config: Config
+    public config: Config,
+    private cartService: CartService
   ) { 
     App.addListener('backButton', data => {
       if (data.canGoBack) {
@@ -37,17 +42,32 @@ export class CartPage implements OnInit {
     this.loadCartData();
   }
 
-  loadCartData() {
-    this.productosSeleccionados = [
-      { nombre: 'Producto A', precio: 10, cantidad: 2, stock: 10, imagen: '../../../assets/img/package.png' },
-      { nombre: 'Producto B', precio: 20, cantidad: 1, stock: 5, imagen: '../../../assets/img/package.png' },
-      { nombre: 'Producto C', precio: 15, cantidad: 1, stock: 5, imagen: '../../../assets/img/package.png' }
-    ];
-    this.clienteSeleccionado = {
-      nombre: 'Cliente Ejemplo',
-      telefono: '123456789',
-      coordenadas: 'geo:0,0'
-    };
+  async loadCartData() {
+    try {
+      const cart = await this.cartService.getCart(); // Asegúrate de usar await para obtener el cart
+  
+      this.productosSeleccionados = cart.products.map(product => ({
+        nombre: product.name,
+        precio: product.unitPrice,
+        cantidad: product.quantity,
+        imagen: '../../../assets/img/package.png'
+      }));
+  
+      if (cart.client.ruc_reason && cart.client.ruc_id) {
+        this.clienteSeleccionado = {
+          nombre: cart.client.ruc_reason ,
+          ruc_id: cart.client.ruc_id
+        };
+      }
+  
+    } catch (error) {
+      console.error('Error al cargar los datos del carrito:', error);
+    }
+  }
+  
+
+  calcularTotal(): number {
+    return this.productosSeleccionados.reduce((total, producto) => total + producto.precio * producto.cantidad, 0);
   }
 
   addProduct(producto: any) {
@@ -109,9 +129,7 @@ export class CartPage implements OnInit {
   }
 
   cambiarCliente() {
-    // Lógica para cambiar el cliente
     console.log('Cambiar cliente');
-    // Puedes abrir un modal o redirigir a una página para seleccionar un nuevo cliente
     this.router.navigate(['/app/tabs/clients']);
   }
 }
