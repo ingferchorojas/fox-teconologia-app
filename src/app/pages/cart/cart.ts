@@ -47,6 +47,7 @@ export class CartPage implements OnInit {
       const cart = await this.cartService.getCart(); // Asegúrate de usar await para obtener el cart
   
       this.productosSeleccionados = cart.products.map(product => ({
+        id: product.id,
         nombre: product.name,
         precio: product.unitPrice,
         cantidad: product.quantity,
